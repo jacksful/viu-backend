@@ -1,0 +1,5 @@
+# Headers when Apache serves this directory via public/storage symlink
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+</IfModule>

@@ -1,0 +1,1 @@
+<img src="{{ asset('image/logo-viu.png') }}" alt="Logo">
