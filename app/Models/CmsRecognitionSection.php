@@ -81,14 +81,14 @@ class CmsRecognitionSection extends Model
     {
         $url = static::publicUrlFor($this->right_image_path);
 
-        return $url ?? asset('image/build-for.png');
+        return $url ?? asset('viu/assets/images/section-3.jpg');
     }
 
     public function getCardLogoUrlAttribute(): string
     {
         $url = static::publicUrlFor($this->card_logo_path);
 
-        return $url ?? asset('image/logo-viu.png');
+        return $url ?? asset('viu/assets/images/logo-dark.svg');
     }
 
     public function progressPercentClamped(): int

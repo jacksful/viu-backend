@@ -1,0 +1,165 @@
+/* ==========================================================================
+   VIU DESIGN SYSTEM — 01 TOKENS
+   --------------------------------------------------------------------------
+   Single source of truth for every design decision (color, type, space,
+   radius, shadow, motion, layout). Components and sections may ONLY consume
+   these custom properties — never hard-coded values.
+
+   Naming mirrors WordPress theme.json flattening so a future block-theme
+   migration is a copy-paste:
+     --viu-color-primary   ->  settings.color.palette  ->  --wp--preset--color--primary
+     --viu-space-6         ->  settings.spacing        ->  --wp--preset--spacing--<slug>
+   See DESIGN-SYSTEM.md for the full mapping table.
+   ========================================================================== */
+
+:root {
+  /* ----------------------------------------------------------------------
+     COLOR — brand
+     ---------------------------------------------------------------------- */
+  --viu-color-primary:        #2a2d7c; /* brand indigo — headings, dark bands */
+  --viu-color-primary-dark:   #1a1c4f; /* footer band */
+  --viu-color-ink:            #121212; /* near-black — navbar bg, button label */
+  --viu-color-accent:         #f57f20; /* signal orange — CTAs, highlights */
+  --viu-color-accent-hover:   #e06d10; /* button hover */
+
+  /* COLOR — tints / surfaces */
+  --viu-color-accent-soft:    rgba(245, 127, 32, 0.10); /* badge & icon-box bg */
+  --viu-color-accent-warm:    #f9eee5;                  /* warm icon-box bg */
+  --viu-color-surface:        #ffffff;
+  --viu-color-surface-alt:    #f8fafc; /* territory band */
+  --viu-color-surface-alt-2:  #f9fafb; /* faq band, checklist tiles */
+
+  /* COLOR — text */
+  --viu-color-text:           #6a7282; /* body copy on light */
+  --viu-color-text-strong:    #4a5565; /* emphasised small caps */
+  --viu-color-text-muted:     #868c96; /* body copy on dark */
+  --viu-color-text-light:     #99a1af; /* captions, "STARTING /MO" */
+  --viu-color-on-primary:     #ffffff;
+
+  /* COLOR — lines */
+  --viu-color-border:         #f3f4f6; /* faq dividers */
+  --viu-color-border-input:   #e5e7eb; /* form inputs */
+  --viu-color-track:          #ebebeb; /* progress-bar track */
+
+  /* COLOR — on-dark transparencies (navbar/cards over dark) */
+  --viu-color-white-05:       rgba(255, 255, 255, 0.05);
+  --viu-color-white-10:       rgba(255, 255, 255, 0.10);
+  --viu-color-white-20:       rgba(255, 255, 255, 0.20);
+
+  /* COLOR — feedback (form states + modal) */
+  --viu-color-success:        #16a34a;
+  --viu-color-success-bright: #22c55e;
+  --viu-color-success-on-dark:#4ade80; /* "ZIP available" on indigo header */
+  --viu-color-success-bg:     #f0fdf4;
+  --viu-color-error:          #dc2626;
+  --viu-color-error-bg:       #fef2f2;
+  --viu-color-warn:           #f59e0b;
+  --viu-color-warn-bg:        #fffbeb;
+
+  /* ----------------------------------------------------------------------
+     TYPOGRAPHY
+     Inter is intentional brand fidelity (matches production VIU site).
+     ---------------------------------------------------------------------- */
+  --viu-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --viu-fw-regular:   400;
+  --viu-fw-medium:    500;
+  --viu-fw-semibold:  600;
+  --viu-fw-bold:      700;
+  --viu-fw-extrabold: 800;
+  --viu-fw-black:     900;
+
+  /* Fluid type scale (rendered values that match the live VIU site) */
+  --viu-fs-display:   clamp(2.25rem, 5vw, 4.5rem);   /* hero H1 */
+  --viu-fs-h2:        clamp(1.75rem, 3.5vw, 3rem);   /* section H2 */
+  --viu-fs-price:     3rem;                           /* $199 */
+  --viu-fs-stat:      2rem;                           /* 90 / 100% / 24/7 */
+  --viu-fs-h3:        1.125rem;                       /* feature titles */
+  --viu-fs-lg:        1.125rem;                       /* lead paragraphs */
+  --viu-fs-base:      1rem;
+  --viu-fs-sm:        0.875rem;
+  --viu-fs-xs:        0.75rem;                         /* eyebrows / labels */
+
+  --viu-lh-display:   1.1;
+  --viu-lh-heading:   1.17;
+  --viu-lh-snug:      1.3;
+  --viu-lh-body:      1.6;
+
+  --viu-ls-display:   -0.06em;   /* hero H1 */
+  --viu-ls-heading:   -0.03em;   /* H2 */
+  --viu-ls-tight:     -0.45px;   /* H3 / card titles */
+  --viu-ls-label:     0.3px;     /* subtle tracking for sentence-case eyebrows/labels */
+
+  /* ----------------------------------------------------------------------
+     SPACING — 8px base scale
+     ---------------------------------------------------------------------- */
+  --viu-space-0:  0;
+  --viu-space-1:  0.25rem;  /*  4px */
+  --viu-space-2:  0.5rem;   /*  8px */
+  --viu-space-3:  0.75rem;  /* 12px */
+  --viu-space-4:  1rem;     /* 16px */
+  --viu-space-5:  1.25rem;  /* 20px */
+  --viu-space-6:  1.5rem;   /* 24px */
+  --viu-space-8:  2rem;     /* 32px */
+  --viu-space-10: 2.5rem;   /* 40px */
+  --viu-space-12: 3rem;     /* 48px */
+  --viu-space-16: 4rem;     /* 64px */
+  --viu-space-18: 4.5rem;   /* 72px */
+  --viu-space-20: 5rem;     /* 80px */
+
+  /* Section rhythm (py-12 -> md -> lg on the live site) */
+  --viu-section-py:    clamp(3rem, 5vw, 5rem);   /* 48 -> 80 */
+  --viu-section-py-lg: clamp(4rem, 6vw, 5rem);   /* 64 -> 80 (pricing / faq) */
+
+  /* ----------------------------------------------------------------------
+     LAYOUT
+     ---------------------------------------------------------------------- */
+  --viu-container-max: 1440px;
+  --viu-gutter:    1.25rem;  /* 20px  (base)        */
+  --viu-gutter-sm: 2.5rem;   /* 40px  (>=640px)     */
+  --viu-gutter-md: 4rem;     /* 64px  (>=768px)     */
+  --viu-gutter-lg: 5rem;     /* 80px  (>=1024px)    */
+
+  /* Breakpoints are documented here; CSS media queries use the raw px.
+     --bp-sm: 640px | --bp-md: 768px | --bp-lg: 1024px */
+
+  /* ----------------------------------------------------------------------
+     RADIUS — the brand uses sharp corners by default
+     ---------------------------------------------------------------------- */
+  --viu-radius-none: 0;
+  --viu-radius-chip: 4px;      /* checklist tiles */
+  --viu-radius-md:   6px;      /* footer social squares */
+  --viu-radius-pill: 9999px;   /* badges, progress bar, icon circles */
+
+  /* ----------------------------------------------------------------------
+     SHADOW
+     ---------------------------------------------------------------------- */
+  --viu-shadow-card:
+    0 20px 25px -5px rgba(0, 0, 0, 0.10),
+    0 8px 10px -6px rgba(0, 0, 0, 0.10);            /* overlay cards (shadow-xl) */
+  --viu-shadow-btn:
+    0 20px 25px 0 rgba(0, 0, 0, 0.05),
+    0 8px 10px 0 rgba(0, 0, 0, 0.05);               /* primary button rest */
+  --viu-shadow-btn-hover:
+    0 24px 30px 0 rgba(245, 127, 32, 0.25);         /* primary button hover */
+  --viu-shadow-nav:
+    0 10px 15px -3px rgba(0, 0, 0, 0.10),
+    0 4px 6px -4px rgba(0, 0, 0, 0.10);             /* scrolled navbar */
+
+  /* ----------------------------------------------------------------------
+     MOTION
+     ---------------------------------------------------------------------- */
+  --viu-ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --viu-dur-fast:    200ms;
+  --viu-dur-base:    300ms;
+  --viu-dur-slow:    400ms;
+  --viu-dur-reveal:  700ms;
+  --viu-dur-reveal-lg: 900ms;
+  --viu-dur-hero:    1000ms;
+
+  /* ----------------------------------------------------------------------
+     Z-INDEX
+     ---------------------------------------------------------------------- */
+  --viu-z-header:  50;
+  --viu-z-overlay: 100;
+}

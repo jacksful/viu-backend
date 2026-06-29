@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use App\Models\Contact;
 use App\Models\EmailSetting;
+use App\Models\StripeSetting;
+use App\Models\CmsAboutHeroSection;
+use App\Models\CmsAboutMissionSection;
+use App\Models\CmsAboutPrinciplesSection;
 use App\Models\CmsHeroSection;
 use App\Models\CmsPricingSection;
 use App\Models\CmsQaSection;
@@ -32,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         try {
             EmailSetting::applyMailConfig();
+            StripeSetting::applyConfig();
         } catch (\Throwable) {
             // Database may be unavailable during initial install.
         }
@@ -39,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Queue::before(function (): void {
             try {
                 EmailSetting::applyMailConfig();
+                StripeSetting::applyConfig();
             } catch (\Throwable) {
                 //
             }
@@ -52,6 +58,9 @@ class AppServiceProvider extends ServiceProvider
         CmsRecognitionSection::observe($observer);
         CmsPricingSection::observe($observer);
         CmsQaSection::observe($observer);
+        CmsAboutHeroSection::observe($observer);
+        CmsAboutMissionSection::observe($observer);
+        CmsAboutPrinciplesSection::observe($observer);
 
         Contact::observe(ContactObserver::class);
     }

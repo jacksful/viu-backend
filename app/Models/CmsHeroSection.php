@@ -32,7 +32,7 @@ class CmsHeroSection extends Model
     public function getImageUrlAttribute(): ?string
     {
         if (! $this->image_path) {
-            return null;
+            return asset('viu/assets/images/hero-bg.jpg');
         }
 
         return asset('storage/'.$this->image_path);

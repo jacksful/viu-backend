@@ -87,7 +87,7 @@ class CmsTerritoryZipSection extends Model
     {
         $url = static::publicUrlFor($this->left_visual_image_path);
 
-        return $url ?? asset('image/be-first.png');
+        return $url ?? asset('viu/assets/images/section-2.jpg');
     }
 
     public function getLeftCardIconUrlAttribute(): string

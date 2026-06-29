@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ZipcodeResource\Pages;
 use App\Models\Zipcode;
+use App\Services\ZipcodeStripePriceService;
 use Filament\Actions;
 use Filament\Forms\Components;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components as SchemaComponents;
 use Filament\Schemas\Schema;
@@ -84,6 +86,30 @@ class ZipcodeResource extends Resource
                     ])
                     ->columns(2),
 
+                SchemaComponents\Section::make('Stripe')
+                    ->description('Create Stripe prices after saving zipcode pricing. Yearly price maps to stripe_price_id; monthly price maps to stripe_monthly_price_id.')
+                    ->schema([
+                        Components\TextInput::make('stripe_product_id')
+                            ->label('Stripe Product ID')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder('Not created yet'),
+
+                        Components\TextInput::make('stripe_price_id')
+                            ->label('Stripe Yearly Price ID')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder('Not created yet'),
+
+                        Components\TextInput::make('stripe_monthly_price_id')
+                            ->label('Stripe Monthly Price ID')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->placeholder('Not created yet'),
+                    ])
+                    ->columns(2)
+                    ->visible(fn (?Zipcode $record): bool => $record !== null),
+
                 Components\Toggle::make('is_active')
                     ->label('Active')
                     ->default(true)
@@ -130,6 +156,18 @@ class ZipcodeResource extends Resource
                     ->sortable()
                     ->alignEnd(),
 
+                Tables\Columns\IconColumn::make('stripe_price_id')
+                    ->label('Stripe Price')
+                    ->boolean()
+                    ->getStateUsing(fn (Zipcode $record): bool => filled($record->stripe_price_id))
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-minus-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray')
+                    ->tooltip(fn (Zipcode $record): string => filled($record->stripe_price_id)
+                        ? "Yearly: {$record->stripe_price_id}"
+                        : 'Stripe price not created'),
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
@@ -155,6 +193,39 @@ class ZipcodeResource extends Resource
                     ->falseLabel('Inactive only'),
             ])
             ->actions([
+                Actions\Action::make('createStripePrice')
+                    ->label('Create Stripe Price')
+                    ->icon('heroicon-o-credit-card')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalHeading('Create Stripe Prices')
+                    ->modalDescription(fn (Zipcode $record): string => "Create Stripe product and price objects for ZIP {$record->code}. Existing prices are reused when amount and interval match.")
+                    ->visible(fn (Zipcode $record): bool => $record->hasBillingPlans())
+                    ->action(function (Zipcode $record, ZipcodeStripePriceService $stripePrices): void {
+                        try {
+                            $result = $stripePrices->syncPrices($record->fresh());
+
+                            $created = collect([
+                                filled($result['yearly_price_id']) ? "Yearly: {$result['yearly_price_id']}" : null,
+                                filled($result['monthly_price_id']) ? "Monthly: {$result['monthly_price_id']}" : null,
+                            ])->filter()->implode("\n");
+
+                            Notification::make()
+                                ->title('Stripe prices synced')
+                                ->body($created !== '' ? $created : 'Stripe product updated.')
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $exception) {
+                            report($exception);
+
+                            Notification::make()
+                                ->title('Stripe price creation failed')
+                                ->body($exception->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
                 Actions\EditAction::make()
                     ->modalHeading('Edit Zipcode')
                     ->modalWidth('5xl')

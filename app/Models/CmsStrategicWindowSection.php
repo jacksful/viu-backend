@@ -93,7 +93,7 @@ class CmsStrategicWindowSection extends Model
     {
         $url = static::publicUrlFor($this->visual_image_path);
 
-        return $url ?? asset('image/be-first.png');
+        return $url ?? asset('viu/assets/images/section-1.jpg');
     }
 
     public function getCardIconUrlAttribute(): string

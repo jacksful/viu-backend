@@ -24,7 +24,7 @@ class TotalSalesWidget extends BaseWidget
                 return $zipcodes->sum(function ($zipcode) use ($subscription) {
                     // Determine if subscription is monthly or yearly based on duration
                     $startDate = Carbon::parse($subscription->start_date);
-                    $endDate = $subscription->end_date ? Carbon::parse($subscription->end_date) : now();
+                    $endDate = $subscription->revenueEndAt();
                     $months = $startDate->diffInMonths($endDate);
 
                     // If subscription is 12+ months, use yearly price, otherwise monthly
@@ -43,8 +43,11 @@ class TotalSalesWidget extends BaseWidget
         $previousMonthSales = UserZipcodeSubscription::active()
             ->where('start_date', '<=', $previousMonthEnd)
             ->where(function ($query) use ($previousMonthStart) {
-                $query->whereNull('end_date')
-                    ->orWhere('end_date', '>=', $previousMonthStart);
+                $query->where('status', 'active')
+                    ->orWhere(function ($query) use ($previousMonthStart) {
+                        $query->whereNotNull('end_date')
+                            ->where('end_date', '>=', $previousMonthStart);
+                    });
             })
             ->with('user')
             ->get()
@@ -52,7 +55,7 @@ class TotalSalesWidget extends BaseWidget
                 $zipcodes = Zipcode::whereIn('id', $subscription->zipcode_ids ?? [])->get();
                 return $zipcodes->sum(function ($zipcode) use ($subscription) {
                     $startDate = Carbon::parse($subscription->start_date);
-                    $endDate = $subscription->end_date ? Carbon::parse($subscription->end_date) : now();
+                    $endDate = $subscription->revenueEndAt();
                     $months = $startDate->diffInMonths($endDate);
 
                     if ($months >= 12) {

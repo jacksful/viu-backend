@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class UserZipcodeSubscription extends Model
 {
@@ -15,6 +16,9 @@ class UserZipcodeSubscription extends Model
         'start_date',
         'end_date',
         'status',
+        'stripe_subscription_id',
+        'stripe_customer_id',
+        'billing_interval',
     ];
 
     protected $casts = [
@@ -107,6 +111,25 @@ class UserZipcodeSubscription extends Model
     public function scopeForZipcode($query, $zipcodeId)
     {
         return $query->whereJsonContains('zipcode_ids', $zipcodeId);
+    }
+
+    public function formattedStartDate(): string
+    {
+        return $this->start_date?->format('M j, Y') ?? '—';
+    }
+
+    public function formattedEndDate(): string
+    {
+        return $this->end_date?->format('M j, Y') ?? 'Ongoing';
+    }
+
+    public function revenueEndAt(): Carbon
+    {
+        if ($this->status === 'active') {
+            return now();
+        }
+
+        return $this->end_date ? Carbon::parse($this->end_date) : now();
     }
 
     /**

@@ -4,6 +4,8 @@
     subscriptionLoading: false,
     subscriptionData: {
         memberSince: '',
+        subscriptionStart: '',
+        subscriptionEnd: '',
         nextBillingDate: '',
         zipcodeCount: 0,
         totalMonthly: '0.00',
@@ -91,6 +93,14 @@
                                     <span class="text-sm font-medium text-gray-900" x-text="subscriptionData.memberSince"></span>
                                 </div>
                                 <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Subscription Start</span>
+                                    <span class="text-sm font-medium text-gray-900" x-text="subscriptionData.subscriptionStart"></span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Subscription End</span>
+                                    <span class="text-sm font-medium text-gray-900" x-text="subscriptionData.subscriptionEnd"></span>
+                                </div>
+                                <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-600">Next Billing Date</span>
                                     <span class="text-sm font-medium text-gray-900" x-text="subscriptionData.nextBillingDate"></span>
                                 </div>
@@ -121,7 +131,9 @@
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-semibold text-gray-900" x-text="'ZIP ' + zipcode.code"></p>
                                             <p class="text-xs text-gray-600 mt-1" x-text="zipcode.city + ', ' + zipcode.state"></p>
-                                            <p class="text-sm font-medium text-gray-900 mt-2" x-text="zipcode.monthly_price ? ('$' + zipcode.monthly_price + '/month') : '—'"></p>
+                                            <p class="text-sm font-medium text-gray-900 mt-2" x-text="zipcode.price ? ('$' + zipcode.price + (zipcode.price_label || '/month')) : '—'"></p>
+                                            <p class="text-xs text-gray-500 mt-2" x-show="zipcode.subscription_start" x-text="'Start: ' + zipcode.subscription_start"></p>
+                                            <p class="text-xs text-gray-500" x-show="zipcode.subscription_end" x-text="'End: ' + zipcode.subscription_end"></p>
                                         </div>
                                     </div>
                                 </div>

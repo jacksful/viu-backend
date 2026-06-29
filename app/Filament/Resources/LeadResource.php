@@ -456,7 +456,7 @@ class LeadResource extends Resource
                                 'user_id' => $user->id,
                                 'zipcode_ids' => $record->zipcodes->pluck('id')->all(),
                                 'start_date' => now()->toDateString(),
-                                'end_date' => null,
+                                'end_date' => now()->addMonth()->toDateString(),
                                 'status' => 'active',
                             ]);
                         }

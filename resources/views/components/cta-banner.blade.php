@@ -1,13 +1,13 @@
-<section class="py-5">
-    <div class="container">
-        <div class="px-4 py-4 py-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4" style="background: #2A2D7C;">
-            <div class="text-center text-md-start">
-                <h2 class="text-white fw-bold text-uppercase mb-2" style="font-size: clamp(1.1rem, 2vw, 1.35rem); letter-spacing: 0.04em;">Still have questions?</h2>
-                <p class="text-white opacity-75 mb-0 small">Our team can walk you through coverage, pricing, and onboarding.</p>
+<section class="alignfull bg-primary viu-cta">
+    <div class="container section--lg">
+        <div class="viu-cta__inner">
+            <span class="viu-badge viu-badge--white">Secure your territory</span>
+            <h2 class="viu-h2 viu-cta__title">The best time to be known is before you're needed</h2>
+            <p class="viu-cta__text">Claim your exclusive ZIP before a competitor locks it in, one agent per market, positioned long before search begins.</p>
+            <div class="viu-cta__actions">
+                <button class="viu-btn viu-btn--primary viu-btn--lg" type="button" data-viu-modal-open>Check territory</button>
+                <button class="viu-btn viu-btn--outline viu-btn--lg" type="button" data-viu-contact-open>Contact a specialist</button>
             </div>
-            <button type="button" class="btn btn-viu-orange flex-shrink-0" data-bs-toggle="modal" data-bs-target="#contactModal">
-                Talk to our team
-            </button>
         </div>
     </div>
 </section>

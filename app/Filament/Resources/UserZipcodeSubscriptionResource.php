@@ -85,6 +85,16 @@ class UserZipcodeSubscriptionResource extends Resource
 
                 SchemaComponents\Section::make('Status')
                     ->schema([
+                        Components\Select::make('billing_interval')
+                            ->label('Billing plan')
+                            ->options([
+                                'month' => 'Monthly',
+                                'year' => 'Yearly',
+                            ])
+                            ->nullable()
+                            ->placeholder('Not set')
+                            ->helperText('Stripe billing interval for this subscription'),
+
                         Components\Select::make('status')
                             ->label('Status')
                             ->required()
@@ -182,6 +192,16 @@ class UserZipcodeSubscriptionResource extends Resource
                     ->searchable()
                     ->placeholder('Ongoing')
                     ->toggleable(),
+
+                Tables\Columns\TextColumn::make('billing_interval')
+                    ->label('Plan')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'year' => 'Yearly',
+                        'month' => 'Monthly',
+                        default => '—',
+                    })
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')

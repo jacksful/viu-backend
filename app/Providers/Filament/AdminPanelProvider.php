@@ -10,6 +10,7 @@ use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\ChangePassword;
 use App\Filament\Pages\EditProfile;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -43,6 +44,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([])
+            ->navigationGroups([
+                NavigationGroup::make('CMS'),
+                NavigationGroup::make('Customer Management'),
+                NavigationGroup::make('Data Management'),
+                NavigationGroup::make('Settings'),
+            ])
 
 
             ->middleware([

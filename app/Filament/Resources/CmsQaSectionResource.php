@@ -23,7 +23,9 @@ class CmsQaSectionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'CMS';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?string $navigationParentItem = 'Home Page';
+
+    protected static ?int $navigationSort = 16;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 

@@ -1,0 +1,438 @@
+/* ==========================================================================
+   VIU DESIGN SYSTEM — 03 COMPONENTS
+   Reusable, namespaced (.viu-*) BEM components. State via .is-* classes.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BUTTON
+   -------------------------------------------------------------------------- */
+.viu-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--viu-space-2);
+  font-weight: var(--viu-fw-semibold);
+  
+  text-align: center;
+  white-space: nowrap;
+  transition: background-color var(--viu-dur-base) var(--viu-ease),
+              box-shadow var(--viu-dur-base) var(--viu-ease),
+              transform var(--viu-dur-base) var(--viu-ease);
+}
+
+/* sizes */
+.viu-btn--sm { padding: 0.75rem 1rem;   font-size: var(--viu-fs-sm);   line-height: 1.25rem; }
+.viu-btn--md { padding: 0.75rem 1.5rem; font-size: var(--viu-fs-base); line-height: 1.5rem; }
+.viu-btn--lg { padding: 1rem 2rem;      font-size: var(--viu-fs-lg);   line-height: 1.5rem; }
+
+/* variants */
+.viu-btn--primary {
+  background: var(--viu-color-accent);
+  color: var(--viu-color-ink);
+  box-shadow: var(--viu-shadow-btn);
+}
+.viu-btn--primary:hover {
+  background: var(--viu-color-accent-hover);
+  box-shadow: var(--viu-shadow-btn-hover);
+  transform: translateY(-1px);
+}
+.viu-btn--primary:active { transform: translateY(0) scale(0.98); }
+
+.viu-btn--outline {
+  background: var(--viu-color-white-10);
+  border: 1px solid var(--viu-color-white-20);
+  color: var(--viu-color-on-primary);
+}
+.viu-btn--outline:hover { background: var(--viu-color-white-20); }
+
+.viu-btn--ghost { color: var(--viu-color-primary); }
+.viu-btn--ghost:hover { background: var(--viu-color-accent-soft); }
+
+.viu-btn--full { width: 100%; }
+
+.viu-btn:disabled,
+.viu-btn.is-loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   BADGE / eyebrow pill
+   -------------------------------------------------------------------------- */
+.viu-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: var(--viu-radius-pill);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--viu-fs-sm);
+  font-weight: var(--viu-fw-semibold);
+  letter-spacing: var(--viu-ls-label);
+  line-height: 1.25rem;
+  
+}
+.viu-badge--orange { background: var(--viu-color-accent-soft); color: var(--viu-color-primary); }
+.viu-badge--white  { background: var(--viu-color-white-20); color: var(--viu-color-on-primary); }
+
+/* --------------------------------------------------------------------------
+   ICON BOX
+   -------------------------------------------------------------------------- */
+.viu-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--viu-radius-pill);
+  color: var(--viu-color-accent);
+}
+.viu-icon-box--sm { width: 1.5rem;  height: 1.5rem; }
+.viu-icon-box--md { width: 3.5rem;  height: 3.5rem; }
+.viu-icon-box--lg { width: 4rem;    height: 4rem; }
+
+.viu-icon-box--orange  { background: var(--viu-color-accent-soft); }
+.viu-icon-box--warm    { background: var(--viu-color-accent-warm); }
+.viu-icon-box--primary { background: var(--viu-color-primary); color: var(--viu-color-on-primary); }
+.viu-icon-box--subtle  { background: rgba(42, 45, 124, 0.05); color: var(--viu-color-primary); }
+.viu-icon-box--success { background: var(--viu-color-success-bg); color: var(--viu-color-success-bright); }
+
+/* Inline icon sizing helper (svg uses currentColor) */
+.viu-icon { width: 1.5rem; height: 1.5rem; }
+.viu-icon--sm  { width: 0.875rem; height: 0.875rem; }
+.viu-icon--md  { width: 1.25rem;  height: 1.25rem; }
+.viu-icon--lg  { width: 1.75rem;  height: 1.75rem; }
+
+/* --------------------------------------------------------------------------
+   PROGRESS BAR
+   -------------------------------------------------------------------------- */
+.viu-progress {
+  width: 100%;
+  height: 0.75rem;
+  border-radius: var(--viu-radius-pill);
+  background: var(--viu-color-track);
+  overflow: hidden;
+}
+.viu-progress__fill {
+  height: 100%;
+  width: 0;
+  border-radius: var(--viu-radius-pill);
+  background: var(--viu-color-accent);
+  transition: width 1400ms var(--viu-ease) 300ms;
+}
+.viu-progress.is-visible .viu-progress__fill { width: var(--viu-progress-value, 0%); }
+@media (min-width: 640px) {
+  .viu-progress { height: 1.125rem; }
+}
+
+/* --------------------------------------------------------------------------
+   OVERLAY CARD (floating card over section imagery)
+   -------------------------------------------------------------------------- */
+.viu-card {
+  background: var(--viu-color-surface);
+  padding: var(--viu-space-4);
+  box-shadow: var(--viu-shadow-card);
+}
+@media (min-width: 640px) {
+  .viu-card { padding: var(--viu-space-6); }
+}
+
+/* --------------------------------------------------------------------------
+   FORM CONTROLS
+   -------------------------------------------------------------------------- */
+.viu-input {
+  width: 100%;
+  background: var(--viu-color-surface);
+  border: 1px solid var(--viu-color-border-input);
+  padding: 0.75rem 1rem;
+  font-size: var(--viu-fs-base);
+  color: var(--viu-color-ink);
+  transition: border-color var(--viu-dur-base) var(--viu-ease);
+}
+.viu-input::placeholder { color: var(--viu-color-text-light); }
+.viu-input:focus { outline: none; border-color: var(--viu-color-primary); }
+.viu-textarea { resize: none; }
+
+.viu-field-error {
+  font-size: var(--viu-fs-sm);
+  color: var(--viu-color-accent);
+}
+
+.viu-form-result {
+  font-size: var(--viu-fs-sm);
+  font-weight: var(--viu-fw-medium);
+  padding: 0.75rem 1rem;
+}
+.viu-form-result--success { background: var(--viu-color-success-bg); color: var(--viu-color-success); border: 1px solid #bbf7d0; }
+.viu-form-result--error   { background: var(--viu-color-error-bg);   color: var(--viu-color-error);   border: 1px solid #fecaca; }
+
+/* Truncated text with hover/focus tooltip */
+.viu-truncate-tooltip {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
+}
+.viu-truncate-tooltip__text {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.02em;
+}
+.viu-truncate-tooltip__tip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  min-width: max-content;
+  max-width: min(22rem, 70vw);
+  padding: 0.5rem 0.75rem;
+  background: var(--viu-color-ink);
+  color: var(--viu-color-on-primary);
+  font-size: var(--viu-fs-xs);
+  font-weight: var(--viu-fw-medium);
+  line-height: 1.45;
+  letter-spacing: 0;
+  word-break: break-all;
+  border-radius: var(--viu-radius-md);
+  box-shadow: var(--viu-shadow-card);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.25rem);
+  transition:
+    opacity var(--viu-dur-fast) var(--viu-ease),
+    visibility var(--viu-dur-fast) var(--viu-ease),
+    transform var(--viu-dur-fast) var(--viu-ease);
+  pointer-events: none;
+}
+.viu-truncate-tooltip__tip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0.75rem;
+  border: 0.35rem solid transparent;
+  border-bottom-color: var(--viu-color-ink);
+}
+.viu-truncate-tooltip.is-active .viu-truncate-tooltip__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Spinner used in submitting buttons */
+.viu-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: viu-spin 0.7s linear infinite;
+}
+@keyframes viu-spin { to { transform: rotate(360deg); } }
+
+/* --------------------------------------------------------------------------
+   REVEAL ANIMATION PRIMITIVES (driven by IntersectionObserver -> .is-visible)
+   -------------------------------------------------------------------------- */
+/* Reveal is a progressive enhancement: the hidden/offset initial state only
+   applies when JS is available (html.js). Without JS, content is fully visible. */
+.viu-reveal {
+  transition-property: opacity, transform, filter;
+  transition-timing-function: var(--viu-ease);
+  transition-duration: var(--viu-dur-reveal-lg);
+  transition-delay: var(--viu-reveal-delay, 0ms);
+}
+/* Promote to its own layer only while waiting to animate; dropped once visible. */
+.js .viu-reveal:not(.is-visible) { will-change: opacity, transform; }
+.js .viu-reveal          { opacity: 0; }
+.js .viu-reveal--up      { transform: translateY(3rem); }
+.js .viu-reveal--left    { transform: translateX(-3rem); }
+.js .viu-reveal--right   { transform: translateX(3rem); }
+.js .viu-reveal--scale   { transform: scale(0.92); }
+.js .viu-reveal--fade    { transform: none; }
+.js .viu-reveal.is-visible {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+/* --------------------------------------------------------------------------
+   MODAL (ZIP availability funnel — matches live fullviu.com)
+   One reusable modal; the active .viu-modal__step is chosen by [data-step].
+   -------------------------------------------------------------------------- */
+.viu-modal[hidden] { display: none; }
+.viu-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--viu-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--viu-space-4);
+}
+.viu-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: viu-fade var(--viu-dur-fast) var(--viu-ease);
+}
+.viu-modal__panel {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--viu-color-surface);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: viu-slide-up var(--viu-dur-base) var(--viu-ease);
+}
+@keyframes viu-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes viu-slide-up {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.viu-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--viu-radius-pill);
+  background: #f3f4f6;
+  color: #4b5563;
+  transition: background-color var(--viu-dur-fast) var(--viu-ease);
+}
+.viu-modal__close:hover { background: #e5e7eb; }
+.viu-modal__close svg { width: 1rem; height: 1rem; }
+
+/* Step visibility */
+.viu-modal__step { display: none; }
+.viu-modal__step--success,
+.viu-modal__step--unavailable { text-align: center; }
+.viu-modal[data-step="zip-search"]  .viu-modal__step--zip,
+.viu-modal[data-step="form"]        .viu-modal__step--form,
+.viu-modal[data-step="available"]   .viu-modal__step--available,
+.viu-modal[data-step="success"]     .viu-modal__step--success,
+.viu-modal[data-step="unavailable"] .viu-modal__step--unavailable { display: block; }
+
+/* Centered icon header (zip-search / success / unavailable) */
+.viu-modal__pad { padding: 1.25rem; }
+.viu-modal__head { text-align: center; margin-bottom: 1.5rem; }
+.viu-modal__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--viu-radius-pill);
+  margin: 0 auto 1rem;
+}
+.viu-modal__icon svg { width: 1.75rem; height: 1.75rem; }
+.viu-modal__icon--orange { background: var(--viu-color-accent-soft); color: var(--viu-color-accent); }
+.viu-modal__icon--success { background: var(--viu-color-success-bg); color: var(--viu-color-success-bright); }
+.viu-modal__icon--warn { background: var(--viu-color-warn-bg); color: var(--viu-color-warn); }
+.viu-modal__title {
+  font-size: 1.25rem;
+  font-weight: var(--viu-fw-bold);
+  color: var(--viu-color-primary);
+  
+  letter-spacing: var(--viu-ls-tight);
+  margin-bottom: 0.5rem;
+}
+.viu-modal__sub { color: var(--viu-color-text); font-size: var(--viu-fs-base); }
+.viu-modal__body { display: flex; flex-direction: column; gap: 1rem; }
+
+.viu-modal__zip {
+  width: 100%;
+  border: 1px solid var(--viu-color-border-input);
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  font-weight: var(--viu-fw-bold);
+  color: var(--viu-color-ink);
+  text-align: center;
+  letter-spacing: 4px;
+  outline: none;
+  transition: border-color var(--viu-dur-base) var(--viu-ease);
+}
+.viu-modal__zip::placeholder { color: var(--viu-color-text-light); letter-spacing: normal; font-weight: var(--viu-fw-regular); }
+.viu-modal__zip:focus { border-color: var(--viu-color-primary); }
+.viu-modal__error { color: var(--viu-color-error); font-size: var(--viu-fs-sm); text-align: center; }
+
+/* Available step — indigo price header */
+.viu-modal__price-head {
+  background: var(--viu-color-primary);
+  padding: 1.25rem;
+  text-align: center;
+}
+.viu-modal__avail {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;
+  color: var(--viu-color-success-on-dark);
+  font-size: var(--viu-fs-sm); font-weight: var(--viu-fw-semibold);
+   letter-spacing: var(--viu-ls-label);
+}
+.viu-modal__avail svg { width: 1.25rem; height: 1.25rem; }
+.viu-modal__price { display: flex; align-items: flex-end; justify-content: center; gap: 0.25rem; margin-bottom: 0.25rem; }
+.viu-modal__price b { color: var(--viu-color-on-primary); font-size: 2.5rem; font-weight: var(--viu-fw-black); line-height: 1; letter-spacing: -2px; }
+.viu-modal__price span { color: rgba(255, 255, 255, 0.6); font-size: var(--viu-fs-sm); font-weight: var(--viu-fw-bold); }
+.viu-modal__per { color: rgba(255, 255, 255, 0.6); font-size: var(--viu-fs-xs); font-weight: var(--viu-fw-bold);  letter-spacing: var(--viu-ls-label); }
+
+.viu-modal__plans {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0 1.25rem 1.25rem;
+  background: var(--viu-color-primary);
+}
+.viu-modal__plan {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--viu-color-on-primary);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.viu-modal__plan:hover { border-color: rgba(255, 255, 255, 0.45); }
+.viu-modal__plan.is-active {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.16);
+}
+.viu-modal__plan-label {
+  display: block;
+  font-size: var(--viu-fs-xs);
+  font-weight: var(--viu-fw-bold);
+  letter-spacing: var(--viu-ls-label);
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 0.25rem;
+}
+.viu-modal__plan-amount {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: var(--viu-fw-black);
+  line-height: 1.1;
+}
+
+.viu-modal__lead { padding: 1.25rem; display: flex; flex-direction: column; }
+.viu-modal__lead h3 { font-size: 1.125rem; font-weight: var(--viu-fw-bold); color: var(--viu-color-primary);  margin-bottom: 0.25rem; }
+.viu-modal__lead p.viu-modal__lead-sub { color: var(--viu-color-text); font-size: var(--viu-fs-sm); margin-bottom: 1.25rem; }
+.viu-modal__lead .viu-input { margin-bottom: 0.75rem; }
+.viu-modal__fine { color: var(--viu-color-text-light); font-size: var(--viu-fs-xs); text-align: center; margin-top: 1rem; }
+
+.viu-modal__msg { color: var(--viu-color-text); font-size: var(--viu-fs-base); margin-bottom: 0.5rem; }
+.viu-modal__msg--sm { font-size: var(--viu-fs-sm); margin-bottom: 1.5rem; }
+
+@media (min-width: 640px) {
+  .viu-modal__pad, .viu-modal__lead { padding: 2rem; }
+  .viu-modal__price-head { padding: 1.5rem 2rem; }
+  .viu-modal__title { font-size: 1.5rem; }
+}
+
+/* Body scroll lock while a modal is open */
+body.viu-modal-open { overflow: hidden; }

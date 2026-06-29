@@ -23,7 +23,9 @@ class CmsTerritoryZipSectionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'CMS';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationParentItem = 'Home Page';
+
+    protected static ?int $navigationSort = 13;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map-pin';
 

@@ -77,7 +77,7 @@ class CmsPricingSection extends Model
     {
         $url = static::publicUrlFor($this->left_image_path);
 
-        return $url ?? asset('image/pricing-image.jpg');
+        return $url ?? asset('viu/assets/images/section-4.jpg');
     }
 
     /**

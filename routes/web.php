@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\CustomerVerificationNoticeController;
 use App\Http\Controllers\Auth\CustomerVerificationResendController;
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\StripeCheckoutController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Middleware\EnsureCustomerRole;
 use Illuminate\Support\Facades\Route;
 
@@ -40,9 +42,24 @@ Route::get('/', function () {
     return view('home', compact('zipcodes', 'hero', 'strategicWindow', 'territoryZip', 'recognition', 'pricing', 'qa'));
 });
 
+Route::get('/about', function () {
+    $aboutHero = \App\Models\CmsAboutHeroSection::singleton();
+    $aboutMission = \App\Models\CmsAboutMissionSection::singleton();
+    $aboutPrinciples = \App\Models\CmsAboutPrinciplesSection::singleton();
+
+    return view('about', compact('aboutHero', 'aboutMission', 'aboutPrinciples'));
+})->name('about');
+Route::view('/privacy', 'privacy')->name('privacy');
+Route::view('/terms', 'terms')->name('terms');
+
 // Lead submission route (public)
 Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 Route::post('/leads/check-availability', [LeadController::class, 'checkAvailability'])->name('leads.check-availability');
+
+// Stripe checkout & webhooks
+Route::post('/stripe/checkout', [StripeCheckoutController::class, 'create'])->name('stripe.checkout');
+Route::get('/stripe/checkout/success', [StripeCheckoutController::class, 'success'])->name('stripe.checkout.success');
+Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');
 
 // Contact form submission route (public)
 Route::post('/contacts', [\App\Http\Controllers\ContactController::class, 'store'])->name('contacts.store');

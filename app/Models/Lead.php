@@ -15,6 +15,8 @@ class Lead extends Model
         'initial_notes',
         'lead_status',
         'payment_status',
+        'stripe_checkout_session_id',
+        'stripe_subscription_id',
         'last_contact_date',
         'next_follow_up_date',
         'internal_comments',

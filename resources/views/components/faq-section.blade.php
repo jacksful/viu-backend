@@ -5,40 +5,34 @@
     $openIdx = $q->defaultOpenFaqIndex();
 @endphp
 
-<section id="faq" class="py-5" style="background-color: #F9FAFB;">
-    <div class="container py-lg-2">
-        <div class="row g-5 align-items-start">
-            <div class="col-lg-5">
-                <p class="faq-section__badge d-inline-block text-viu-navy text-uppercase small fw-bold mb-3 px-3 py-2 rounded-pill">
-                    {{ $q->badge_text }}
-                </p>
-                <h2 class="fw-bold text-viu-navy mb-3 text-uppercase fs-2">{{ $q->heading }}</h2>
-                <p class="text-secondary mb-4 mb-lg-5" style="max-width: 28rem;">
-                    {{ $q->intro }}
-                </p>
-                <div class="d-flex gap-3 align-items-center">
-                    <div class="faq-section__email-icon flex-shrink-0 d-flex align-items-center justify-content-center rounded-3">
-                        <img src="{{ $q->support_icon_url }}" alt="" width="22" height="22" loading="lazy">
-                    </div>
+<section class="alignfull bg-surface-alt-2" id="faq">
+    <div class="container section--lg">
+        <div class="viu-faq-grid">
+            <div class="viu-faq-aside viu-reveal viu-reveal--left">
+                <div class="viu-intro">
+                    <span class="viu-badge viu-badge--orange">{{ $q->badge_text }}</span>
+                    <h2 class="viu-h2">{{ $q->heading }}</h2>
+                    <p class="viu-intro__text">{{ $q->intro }}</p>
+                </div>
+                <div class="viu-faq-support">
+                    <span class="viu-icon-box viu-icon-box--subtle viu-icon-box--md">
+                        <svg class="viu-icon viu-icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                    </span>
                     <div>
-                        <p class="text-secondary text-uppercase small mb-1 fw-semibold" style="letter-spacing: 0.08em;">{{ $q->support_label }}</p>
-                        <a href="mailto:{{ $q->support_email }}" class="fw-bold text-viu-navy text-decoration-none">{{ $q->support_email }}</a>
+                        <span class="viu-faq-support__label">{{ $q->support_label }}</span><br>
+                        <a class="viu-faq-support__email" href="mailto:{{ $q->support_email }}">{{ $q->support_email }}</a>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-7">
-                <div class="faq-section__panel bg-white p-4 p-lg-5">
-                    <div class="d-flex flex-column">
-                        @foreach ($q->faqList() as $idx => $item)
-                            <x-faq-item
-                                :open="$idx === $openIdx"
-                                number=""
-                                :question="$item['question'] ?? ''"
-                                :answer="$item['answer'] ?? ''"
-                            />
-                        @endforeach
-                    </div>
-                </div>
+
+            <div class="viu-faq__list viu-reveal viu-reveal--right" style="--viu-reveal-delay:150ms" data-viu-faq>
+                @foreach ($q->faqList() as $idx => $item)
+                    <x-faq-item
+                        :open="$idx === $openIdx"
+                        :question="$item['question'] ?? ''"
+                        :answer="$item['answer'] ?? ''"
+                    />
+                @endforeach
             </div>
         </div>
     </div>

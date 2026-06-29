@@ -1,60 +1,40 @@
-<header class="site-header">
-    <div class="container">
-        <div class="site-header__bar d-flex align-items-center py-2 py-md-0" style="min-height: var(--site-header-height, 72px);">
-            {{-- Left: logo --}}
-            <div class="flex-grow-1 d-flex justify-content-start align-items-center" style="flex-basis: 0; min-width: 0;">
-                <a href="{{ url('/') }}" class="site-header__brand text-decoration-none d-inline-flex align-items-center">
-                    <img src="{{ asset('image/viu-header-logo.png') }}" alt="{{ config('app.name', 'Viu') }}" class="site-header__logo-img" width="200" height="40" loading="eager">
-                </a>
-            </div>
+@php
+    $home = url('/');
+@endphp
+<header class="site-header" id="site-header" data-viu-header>
+    <div class="container site-header__inner">
+        <a href="{{ $home }}" class="viu-nav__logo" aria-label="VIU home">
+            <img src="{{ asset('viu/assets/images/logo-white.svg') }}" alt="{{ config('app.name', 'VIU') }}" />
+        </a>
 
-            {{-- Center: navigation --}}
-            <nav class="site-header__nav d-none d-lg-flex align-items-center justify-content-center gap-4 gap-xl-5 flex-shrink-0 mx-2" aria-label="Primary">
-                <a href="#solutions" class="site-header__link text-decoration-none">The Advantage</a>
-                <a href="#territory" class="site-header__link text-decoration-none">Territory</a>
-                <a href="#exclusivity" class="site-header__link text-decoration-none">Exclusivity</a>
-                <a href="#pricing" class="site-header__link text-decoration-none">Pricing</a>
-            </nav>
+        <nav class="viu-nav__links" aria-label="Primary">
+            <a class="viu-nav__link" href="{{ $home }}#advantage">The advantage</a>
+            <a class="viu-nav__link" href="{{ $home }}#territory">Territory</a>
+            <a class="viu-nav__link" href="{{ $home }}#exclusivity">Exclusivity</a>
+            <a class="viu-nav__link" href="{{ $home }}#pricing">Pricing</a>
+            <a class="viu-nav__link" href="{{ route('about') }}">About</a>
+        </nav>
 
-            {{-- Right: CTA + mobile toggle --}}
-            <div class="flex-grow-1 d-flex justify-content-end align-items-center gap-2 gap-md-3" style="flex-basis: 0; min-width: 0;">
-                <a href="#hero-zip" class="btn site-header__cta d-none d-lg-inline-flex align-items-center text-decoration-none">
-                    Check territory
-                </a>
-                <button class="d-lg-none btn btn-link text-white p-1 border-0" id="mobile-menu-button" type="button" aria-label="Open menu" aria-expanded="false">
-                    <i class="bi bi-list fs-2"></i>
-                </button>
-            </div>
+        <div class="viu-nav__cta">
+            <button type="button" class="viu-btn viu-btn--primary viu-btn--sm" data-viu-modal-open>Check territory</button>
         </div>
+
+        <button class="viu-nav__toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu" data-viu-nav-toggle>
+            <span></span><span></span><span></span>
+        </button>
     </div>
 
-    <div class="d-none px-3 pb-3 site-header__mobile-panel" id="mobile-menu">
-        <div class="rounded-0 p-3 mt-0 border-top border-secondary border-opacity-25" style="background: rgba(0,0,0,0.65);">
-            <div class="d-flex flex-column gap-3">
-                <a href="#solutions" class="site-header__link text-decoration-none d-block">The Advantage</a>
-                <a href="#territory" class="site-header__link text-decoration-none d-block">Territory</a>
-                <a href="#exclusivity" class="site-header__link text-decoration-none d-block">Exclusivity</a>
-                <a href="#pricing" class="site-header__link text-decoration-none d-block">Pricing</a>
-                <a href="#hero-zip" class="btn site-header__cta w-100 mt-1 text-center text-decoration-none">Check territory</a>
-            </div>
-        </div>
+    <div class="viu-nav__menu" id="mobile-menu">
+        <nav class="container viu-nav__menu-inner" aria-label="Mobile">
+            <a class="viu-nav__link" href="{{ $home }}#advantage" data-viu-nav-close>The advantage</a>
+            <a class="viu-nav__link" href="{{ $home }}#territory" data-viu-nav-close>Territory</a>
+            <a class="viu-nav__link" href="{{ $home }}#exclusivity" data-viu-nav-close>Exclusivity</a>
+            <a class="viu-nav__link" href="{{ $home }}#pricing" data-viu-nav-close>Pricing</a>
+            <a class="viu-nav__link" href="{{ route('about') }}" data-viu-nav-close>About</a>
+            <button type="button" class="viu-btn viu-btn--primary viu-btn--sm viu-btn--full" data-viu-modal-open data-viu-nav-close>Check territory</button>
+        </nav>
     </div>
 </header>
 
+@include('components.zip-modal')
 @include('components.contact-modal')
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('mobile-menu-button');
-        const menu = document.getElementById('mobile-menu');
-        if (btn && menu) {
-            btn.addEventListener('click', function() {
-                menu.classList.toggle('d-none');
-                const open = !menu.classList.contains('d-none');
-                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-            });
-        }
-    });
-</script>
-@endpush

@@ -1,19 +1,25 @@
-<section class="bg-viu-navy text-white py-4">
+<section class="viu-stats alignfull bg-primary" aria-label="Key metrics">
     <div class="container">
-        <div class="row g-0 align-items-stretch text-center">
-            <div class="col-md-4 py-2 py-md-3 px-3">
-                <div class="display-6 fw-bold lh-sm mb-2">90</div>
-                <p class="mb-0 text-uppercase fw-semibold text-white" style="font-size: 0.7rem; letter-spacing: 0.12em; line-height: 1.35;">Pre-market advantage</p>
+        <div class="viu-stats__row">
+            <div class="viu-stats__cell">
+                <div class="viu-stats__item viu-reveal viu-reveal--up">
+                    <span class="viu-stats__value" data-viu-count="90">90</span>
+                    <span class="viu-stats__label">Pre-market advantage</span>
+                </div>
             </div>
-            <div class="col-md-4 position-relative py-2 py-md-3 px-3">
-                <div class="d-none d-md-block position-absolute" style="left: 0; top: 25%; bottom: 25%; width: 1px; background: rgba(255, 255, 255, 0.28);" aria-hidden="true"></div>
-                <div class="display-6 fw-bold lh-sm mb-2">100%</div>
-                <p class="mb-0 text-uppercase fw-semibold text-white" style="font-size: 0.7rem; letter-spacing: 0.12em; line-height: 1.35;">Exclusive rights</p>
+            <div class="viu-stats__cell">
+                <div class="viu-stats__divider"></div>
+                <div class="viu-stats__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:200ms">
+                    <span class="viu-stats__value" data-viu-count="100%">100%</span>
+                    <span class="viu-stats__label">Exclusive rights</span>
+                </div>
             </div>
-            <div class="col-md-4 position-relative py-2 py-md-3 px-3">
-                <div class="d-none d-md-block position-absolute" style="left: 0; top: 25%; bottom: 25%; width: 1px; background: rgba(255, 255, 255, 0.28);" aria-hidden="true"></div>
-                <div class="display-6 fw-bold lh-sm mb-2">24/7</div>
-                <p class="mb-0 text-uppercase fw-semibold text-white" style="font-size: 0.7rem; letter-spacing: 0.12em; line-height: 1.35;">Monitoring</p>
+            <div class="viu-stats__cell">
+                <div class="viu-stats__divider"></div>
+                <div class="viu-stats__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:400ms">
+                    <span class="viu-stats__value" data-viu-count="24/7">24/7</span>
+                    <span class="viu-stats__label">Monitoring</span>
+                </div>
             </div>
         </div>
     </div>

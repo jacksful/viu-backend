@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    /* Progressive enhancement flag. main.js is a classic script (not a module),
+       so it runs from file:// too, animations and the modal work either way. */
+    document.documentElement.classList.remove('no-js');
+    document.documentElement.classList.add('js');
+  </script>
+  <title>VIU | Own the market before they sell</title>
+  <meta name="description" content="Viu uses predictive modeling to place your brand in front of homeowners up to 90 days before they decide to sell, securing your position before search even begins." />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="VIU | Own the market before they sell" />
+  <meta property="og:description" content="Predictive brand positioning for elite real estate professionals." />
+  <meta property="og:image" content="assets/images/hero-bg.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/images/logo-dark.svg" type="image/svg+xml" />
+
+  <!-- Fonts: preconnect + load in <head> (avoids the render-blocking CSS @import waterfall) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+
+  <!-- Styles, linked directly in cascade order so they download in parallel
+       (tokens → base → components → sections → utilities). -->
+  <link rel="stylesheet" href="assets/css/01-tokens.css" />
+  <link rel="stylesheet" href="assets/css/02-base.css" />
+  <link rel="stylesheet" href="assets/css/03-components.css" />
+  <link rel="stylesheet" href="assets/css/04-sections.css" />
+  <link rel="stylesheet" href="assets/css/05-utilities.css" />
+</head>
+<body>
+
+  <!-- ==========================================================================
+       template-part: header  ->  header.php
+       ========================================================================== -->
+  <header class="site-header" id="site-header" data-viu-header>
+    <div class="container site-header__inner">
+      <a href="#hero" class="viu-nav__logo" aria-label="VIU home">
+        <img src="assets/images/logo-white.svg" alt="VIU" />
+      </a>
+
+      <nav class="viu-nav__links" aria-label="Primary">
+        <a class="viu-nav__link" href="#advantage">The advantage</a>
+        <a class="viu-nav__link" href="#territory">Territory</a>
+        <a class="viu-nav__link" href="#exclusivity">Exclusivity</a>
+        <a class="viu-nav__link" href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="viu-nav__cta">
+        <button type="button" class="viu-btn viu-btn--primary viu-btn--sm" data-viu-modal-open>Check territory</button>
+      </div>
+
+      <button class="viu-nav__toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu" data-viu-nav-toggle>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="viu-nav__menu" id="mobile-menu">
+      <nav class="container viu-nav__menu-inner" aria-label="Mobile">
+        <a class="viu-nav__link" href="#advantage" data-viu-nav-close>The advantage</a>
+        <a class="viu-nav__link" href="#territory" data-viu-nav-close>Territory</a>
+        <a class="viu-nav__link" href="#exclusivity" data-viu-nav-close>Exclusivity</a>
+        <a class="viu-nav__link" href="#pricing" data-viu-nav-close>Pricing</a>
+        <button type="button" class="viu-btn viu-btn--primary viu-btn--sm viu-btn--full" data-viu-modal-open data-viu-nav-close>Check territory</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+
+    <!-- ========================================================================
+         template-part: hero  ->  template-parts/hero.php
+         ======================================================================== -->
+    <section class="viu-hero" id="hero">
+      <div class="viu-hero__bg">
+        <img class="viu-hero__bg-img" src="assets/images/hero-bg.jpg" alt="" width="1024" height="1024" fetchpriority="high" data-viu-parallax />
+        <div class="viu-hero__bg-gradient"></div>
+      </div>
+
+      <div class="container viu-hero__inner">
+        <div class="viu-hero__content">
+          <h1 class="viu-display viu-hero__title">
+            <span>Own the market</span>
+            <span>before they sell</span>
+          </h1>
+
+          <p class="viu-hero__text">
+            Viu uses predictive modeling to place your brand in front of homeowners
+            up to 90 days before they decide to start the selling process.
+          </p>
+
+          <form class="viu-hero__form" id="hero-zip" data-viu-hero-form>
+            <div class="viu-hero__row">
+              <div class="viu-hero__input-group">
+                <svg class="viu-icon viu-icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                <label class="u-visually-hidden" for="hero-zip-input">ZIP code</label>
+                <input class="viu-hero__input" id="hero-zip-input" name="zipCode" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code" data-viu-zip-input data-viu-hero-zip />
+              </div>
+              <button class="viu-btn viu-btn--primary viu-btn--md" type="submit">Secure territory</button>
+            </div>
+
+            <div class="viu-hero__trust">
+              <div class="viu-hero__trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+                <span>1 agent per ZIP</span>
+              </div>
+              <div class="viu-hero__trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+                <span>Exclusive access</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: stats  ->  template-parts/stats.php
+         ======================================================================== -->
+    <section class="viu-stats alignfull bg-primary" aria-label="Key metrics">
+      <div class="container">
+        <div class="viu-stats__row">
+          <div class="viu-stats__cell">
+            <div class="viu-stats__item viu-reveal viu-reveal--up">
+              <span class="viu-stats__value" data-viu-count="90">90</span>
+              <span class="viu-stats__label">Pre-market advantage</span>
+            </div>
+          </div>
+          <div class="viu-stats__cell">
+            <div class="viu-stats__divider"></div>
+            <div class="viu-stats__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:200ms">
+              <span class="viu-stats__value" data-viu-count="100%">100%</span>
+              <span class="viu-stats__label">Exclusive rights</span>
+            </div>
+          </div>
+          <div class="viu-stats__cell">
+            <div class="viu-stats__divider"></div>
+            <div class="viu-stats__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:400ms">
+              <span class="viu-stats__value" data-viu-count="24/7">24/7</span>
+              <span class="viu-stats__label">Monitoring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: strategic-window  ->  template-parts/strategic-window.php
+         ======================================================================== -->
+    <section class="alignfull bg-surface" id="advantage">
+      <div class="container section">
+        <div class="viu-split">
+          <!-- content -->
+          <div class="viu-split__content viu-split__content--pad-r viu-reveal viu-reveal--left">
+            <div class="viu-intro viu-intro--snug viu-intro--mb-snug">
+              <span class="viu-badge viu-badge--orange">The 90-day strategic window</span>
+              <h2 class="viu-h2">Be first seen.<br><span class="viu-accent">Be known.</span></h2>
+              <p class="viu-intro__text">
+                Homeowners don’t decide to sell overnight. There’s a window, often 90 days
+                or more, where they’re observing the market before any formal action.
+              </p>
+            </div>
+
+            <div class="viu-feature-list">
+              <div class="viu-feature viu-reveal viu-reveal--up">
+                <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                </span>
+                <div class="viu-feature__body">
+                  <h3 class="viu-h3 viu-feature__title">Identification</h3>
+                  <p class="viu-feature__text">Viu identifies homeowners likely to sell during that critical window using predictive behavior analytics.</p>
+                </div>
+              </div>
+
+              <div class="viu-feature viu-reveal viu-reveal--up" style="--viu-reveal-delay:120ms">
+                <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+                </span>
+                <div class="viu-feature__body">
+                  <h3 class="viu-h3 viu-feature__title">Consistent presence</h3>
+                  <p class="viu-feature__text">Your brand appears daily on the platforms they trust, building familiarity long before search begins.</p>
+                </div>
+              </div>
+
+              <div class="viu-feature viu-reveal viu-reveal--up" style="--viu-reveal-delay:240ms">
+                <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+                </span>
+                <div class="viu-feature__body">
+                  <h3 class="viu-h3 viu-feature__title">Market advantage</h3>
+                  <p class="viu-feature__text">When they finally decide to reach out, your name isn’t new, it’s already the market authority.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- media -->
+          <div class="viu-split__media viu-reveal viu-reveal--right" style="--viu-reveal-delay:200ms">
+            <figure class="viu-figure viu-figure--square">
+              <img src="assets/images/section-1.jpg" alt="Real estate market landscape at dawn" width="1280" height="853" loading="lazy" decoding="async" />
+              <div class="viu-card viu-figure__card">
+                <div class="viu-card__head viu-card__head--top">
+                  <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                    <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+                  </span>
+                  <div class="viu-card__meta">
+                    <span class="viu-card__eyebrow">Predictive signal</span>
+                    <span class="viu-card__title">59715 market intensity</span>
+                  </div>
+                </div>
+                <div class="viu-card__meta">
+                  <div class="viu-card__row">
+                    <span class="viu-card__stat">Early interest</span>
+                    <span class="viu-card__stat">72%</span>
+                  </div>
+                  <div class="viu-progress" data-viu-progress style="--viu-progress-value:72%"><div class="viu-progress__fill"></div></div>
+                  <p class="viu-card__quote">“Capturing attention 3 months before listing behavior peaks.”</p>
+                </div>
+              </div>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: territory  ->  template-parts/territory.php
+         ======================================================================== -->
+    <section class="alignfull bg-surface-alt" id="territory">
+      <div class="container section">
+        <div class="viu-split viu-split--reverse">
+          <!-- media -->
+          <div class="viu-split__media viu-reveal viu-reveal--left">
+            <figure class="viu-figure viu-figure--tall">
+              <img src="assets/images/section-2.jpg" alt="Territory ownership map" width="1024" height="1024" loading="lazy" decoding="async" />
+              <div class="viu-card viu-figure__card viu-figure__card--wide">
+                <div class="viu-card__head">
+                  <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                    <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                  </span>
+                  <div class="viu-card__meta">
+                    <span class="viu-card__eyebrow">ZIP territory: 59715</span>
+                    <span class="viu-card__title">Market ownership</span>
+                  </div>
+                </div>
+                <div class="viu-checklist">
+                  <div class="viu-checklist__item">
+                    <span class="viu-checklist__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"/><path d="m9 11 3 3L22 4"/></svg></span>
+                    <span class="viu-checklist__label">Predictive homeowner targeting active</span>
+                  </div>
+                  <div class="viu-checklist__item">
+                    <span class="viu-checklist__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"/><path d="m9 11 3 3L22 4"/></svg></span>
+                    <span class="viu-checklist__label">Daily brand reinforcement running</span>
+                  </div>
+                  <div class="viu-checklist__item">
+                    <span class="viu-checklist__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"/><path d="m9 11 3 3L22 4"/></svg></span>
+                    <span class="viu-checklist__label">Competitor lockout engaged</span>
+                  </div>
+                  <div class="viu-checklist__item">
+                    <span class="viu-checklist__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"/><path d="m9 11 3 3L22 4"/></svg></span>
+                    <span class="viu-checklist__label">Market share compounding</span>
+                  </div>
+                </div>
+              </div>
+            </figure>
+          </div>
+
+          <!-- content -->
+          <div class="viu-split__content viu-split__content--pad-l viu-reveal viu-reveal--right" style="--viu-reveal-delay:150ms">
+            <div class="viu-intro viu-intro--mb">
+              <span class="viu-badge viu-badge--orange">Territory lock engaged</span>
+              <h2 class="viu-h2">One ZIP.<br><span class="viu-accent">One agent.</span></h2>
+              <p class="viu-intro__text">
+                Every ZIP inside Viu is assigned to a single agent at a time.
+                While active, no other agent can enter that ZIP.
+              </p>
+            </div>
+
+            <div class="viu-exclusivity">
+              <div class="viu-exclusivity__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:200ms">
+                <span class="viu-icon-box viu-icon-box--warm viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg viu-icon--thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                </span>
+                <h3 class="viu-h3 viu-exclusivity__label">No sharing</h3>
+              </div>
+              <div class="viu-exclusivity__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:300ms">
+                <span class="viu-icon-box viu-icon-box--warm viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg viu-icon--thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg>
+                </span>
+                <h3 class="viu-h3 viu-exclusivity__label">No overlap</h3>
+              </div>
+              <div class="viu-exclusivity__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:400ms">
+                <span class="viu-icon-box viu-icon-box--warm viu-icon-box--md">
+                  <svg class="viu-icon viu-icon--lg viu-icon--thin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+                </span>
+                <h3 class="viu-h3 viu-exclusivity__label">No congestion</h3>
+              </div>
+            </div>
+
+            <div class="viu-reveal viu-reveal--up" style="--viu-reveal-delay:500ms">
+              <div class="viu-quote">
+                <div class="viu-quote__inner">
+                  <span class="viu-icon-box viu-icon-box--orange viu-icon-box--md">
+                    <svg class="viu-icon viu-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                  </span>
+                  <p class="viu-quote__text">“When a ZIP is live, it’s yours. Period.”</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: brand-authority  ->  template-parts/brand-authority.php
+         ======================================================================== -->
+    <section class="alignfull bg-primary" id="exclusivity">
+      <div class="container section">
+        <div class="viu-split">
+          <!-- content -->
+          <div class="viu-split__content viu-split__content--pad-r viu-reveal viu-reveal--left">
+            <div class="viu-intro viu-intro--snug viu-intro--mb-snug">
+              <span class="viu-badge viu-badge--white">Permanent brand authority</span>
+              <h2 class="viu-h2 viu-on-dark">Built for<br>long-term<br>recognition</h2>
+              <p class="viu-intro__text viu-intro__text--muted">
+                Viu places your brand across the sites homeowners already visit,
+                creating consistent visibility over time.
+              </p>
+            </div>
+
+            <div class="viu-authority">
+              <div class="viu-authority__row">
+                <div class="viu-authority__card"><p>Some homeowners engage quickly.</p></div>
+                <div class="viu-authority__card"><p>Others take longer.</p></div>
+              </div>
+              <div class="viu-reveal viu-reveal--up" style="--viu-reveal-delay:200ms">
+                <div class="viu-authority__card">
+                  <p>What matters is that when the moment arrives, your name isn’t new, it’s already known.</p>
+                  <span class="viu-authority__tag">Familiarity creates trust</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- media -->
+          <div class="viu-split__media viu-reveal viu-reveal--right" style="--viu-reveal-delay:200ms">
+            <figure class="viu-figure viu-figure--square">
+              <img src="assets/images/section-3.jpg" alt="Brand authority visualization" width="490" height="1024" loading="lazy" decoding="async" />
+              <div class="viu-card viu-figure__card">
+                <div class="viu-card__head viu-card__head--stacked">
+                  <img src="assets/images/logo-dark.svg" alt="VIU" class="viu-card__logo" />
+                  <div class="viu-card__meta">
+                    <span class="viu-card__eyebrow">Market authority</span>
+                    <span class="viu-card__title">Continuous visibility</span>
+                  </div>
+                </div>
+                <div class="viu-card__meta">
+                  <div class="viu-card__row">
+                    <span class="viu-card__stat">Brand domination</span>
+                    <span class="viu-card__stat">Compounding</span>
+                  </div>
+                  <div class="viu-progress" data-viu-progress style="--viu-progress-value:98%"><div class="viu-progress__fill"></div></div>
+                </div>
+              </div>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: pricing  ->  template-parts/pricing.php
+         ======================================================================== -->
+    <section class="alignfull bg-surface" id="pricing">
+      <div class="container section--lg">
+        <div class="viu-split viu-split--reverse viu-split--gap-40">
+          <!-- media -->
+          <div class="viu-split__media viu-reveal viu-reveal--left">
+            <figure class="viu-figure viu-figure--pricing">
+              <img src="assets/images/section-4.jpg" alt="Secure territory" width="1024" height="1024" loading="lazy" decoding="async" />
+              <div class="viu-card viu-figure__card viu-price-card">
+                <div class="viu-price-card__head">
+                  <span class="viu-price-card__label">Starting</span>
+                  <div class="viu-price-card__amount">
+                    <span class="viu-price-card__value">$199</span>
+                    <span class="viu-price-card__per">/mo</span>
+                  </div>
+                  <span class="viu-price-card__unit">Per ZIP code</span>
+                </div>
+                <p class="viu-price-card__note">Locked-in pricing for the duration of your active status.</p>
+              </div>
+            </figure>
+          </div>
+
+          <!-- content -->
+          <div class="viu-split__content viu-split__content--pad-l viu-reveal viu-reveal--right" style="--viu-reveal-delay:150ms">
+            <div class="viu-intro viu-intro--mb">
+              <span class="viu-badge viu-badge--orange">Investment structure</span>
+              <h2 class="viu-h2">Pricing</h2>
+              <p class="viu-intro__text">
+                Secure your territory today. Your access remains exclusive for as
+                long as you’re active.
+              </p>
+            </div>
+
+            <div class="viu-pricing-list">
+              <div class="viu-pricing-list__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:200ms">
+                <span class="viu-pricing-list__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
+                <span class="viu-pricing-list__text">Your access remains exclusive for as long as you’re active.</span>
+              </div>
+              <div class="viu-pricing-list__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:300ms">
+                <span class="viu-pricing-list__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
+                <span class="viu-pricing-list__text">If you cancel, the ZIP becomes available again.</span>
+              </div>
+              <div class="viu-pricing-list__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:400ms">
+                <span class="viu-pricing-list__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
+                <span class="viu-pricing-list__text">Onboarding begins immediately.</span>
+              </div>
+              <div class="viu-pricing-list__item viu-reveal viu-reveal--up" style="--viu-reveal-delay:500ms">
+                <span class="viu-pricing-list__mark"><svg class="viu-icon viu-icon--sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg></span>
+                <span class="viu-pricing-list__text">Your brand typically goes live within one week.</span>
+              </div>
+            </div>
+
+            <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-open>Check ZIP availability</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: faq  ->  template-parts/faq.php
+         ======================================================================== -->
+    <section class="alignfull bg-surface-alt-2">
+      <div class="container section--lg">
+        <div class="viu-faq-grid">
+          <!-- aside -->
+          <div class="viu-faq-aside viu-reveal viu-reveal--left">
+            <div class="viu-intro">
+              <span class="viu-badge viu-badge--orange">Information center</span>
+              <h2 class="viu-h2">Common inquiries</h2>
+              <p class="viu-intro__text">
+                Everything you need to know about territory ownership and our
+                predictive visibility network.
+              </p>
+            </div>
+            <div class="viu-faq-support">
+              <span class="viu-icon-box viu-icon-box--subtle viu-icon-box--md">
+                <svg class="viu-icon viu-icon--md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+              </span>
+              <div>
+                <span class="viu-faq-support__label">Email support</span><br>
+                <a class="viu-faq-support__email" href="mailto:support@fullviu.com">support@fullviu.com</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- accordion -->
+          <div class="viu-faq__list viu-reveal viu-reveal--right" style="--viu-reveal-delay:150ms" data-viu-faq>
+            <div class="viu-faq__item is-open">
+              <button class="viu-faq__trigger" type="button" aria-expanded="true">
+                <span class="viu-faq__q">How early does Viu reach homeowners?</span>
+                <span class="viu-faq__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+              </button>
+              <div class="viu-faq__answer"><div class="viu-faq__answer-inner">
+                <p>Viu begins positioning your brand up to 90 days before a homeowner decides to sell, during the early window when they’re quietly observing the market, long before they ever start searching for an agent.</p>
+              </div></div>
+            </div>
+
+            <div class="viu-faq__item">
+              <button class="viu-faq__trigger" type="button" aria-expanded="false">
+                <span class="viu-faq__q">How often does my brand appear?</span>
+                <span class="viu-faq__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+              </button>
+              <div class="viu-faq__answer"><div class="viu-faq__answer-inner">
+                <p>Frequency depends on your ZIP coverage and campaign settings. Your brand surfaces in predictive touchpoints where VIU has visibility for your subscribed territories.</p>
+              </div></div>
+            </div>
+
+            <div class="viu-faq__item">
+              <button class="viu-faq__trigger" type="button" aria-expanded="false">
+                <span class="viu-faq__q">How many agents can use the same ZIP?</span>
+                <span class="viu-faq__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+              </button>
+              <div class="viu-faq__answer"><div class="viu-faq__answer-inner">
+                <p>Each ZIP is reserved for one subscriber at a time so you are not competing with another VIU subscriber in the same area. Team seats are configured under your account.</p>
+              </div></div>
+            </div>
+
+            <div class="viu-faq__item">
+              <button class="viu-faq__trigger" type="button" aria-expanded="false">
+                <span class="viu-faq__q">What happens if I cancel?</span>
+                <span class="viu-faq__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+              </button>
+              <div class="viu-faq__answer"><div class="viu-faq__answer-inner">
+                <p>You retain access through the end of your billing period. After that, ZIP coverage releases and predictive signals for those territories are no longer included in your plan.</p>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         template-part: cta  ->  template-parts/cta.php
+         ======================================================================== -->
+    <section class="alignfull bg-primary viu-cta">
+      <div class="container section--lg">
+        <div class="viu-cta__inner">
+          <span class="viu-badge viu-badge--white">Secure your territory</span>
+          <h2 class="viu-h2 viu-cta__title">The best time to be known is before you’re needed</h2>
+          <p class="viu-cta__text">Claim your exclusive ZIP before a competitor locks it in, one agent per market, positioned long before search begins.</p>
+          <div class="viu-cta__actions">
+            <button class="viu-btn viu-btn--primary viu-btn--lg" type="button" data-viu-modal-open>Check territory</button>
+            <button class="viu-btn viu-btn--outline viu-btn--lg" type="button" data-viu-contact-open>Contact a specialist</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       template-part: footer  ->  footer.php
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <!-- Columns -->
+      <div class="viu-footer__grid">
+        <div class="viu-footer__brand">
+          <img src="assets/images/logo-white.svg" alt="VIU" />
+          <p class="viu-footer__desc">
+            Predictive brand positioning for elite real estate professionals. Our
+            technology identifies intent before search patterns emerge, securing your
+            territory while others are still waiting for listings.
+          </p>
+          <div class="viu-footer__social">
+            <a href="#" aria-label="VIU on Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+            <a href="#" aria-label="VIU on X"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg></a>
+            <a href="#" aria-label="VIU on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a>
+          </div>
+        </div>
+
+        <nav class="viu-footer__col" aria-label="Footer">
+          <h3 class="viu-footer__col-title">Explore</h3>
+          <a href="#advantage">The advantage</a>
+          <a href="#territory">Territory</a>
+          <a href="#exclusivity">Exclusivity</a>
+          <a href="#pricing">Pricing</a>
+          <a href="about.html">About</a>
+        </nav>
+
+        <div class="viu-footer__col">
+          <h3 class="viu-footer__col-title">Contact</h3>
+          <a href="mailto:support@fullviu.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg> support@fullviu.com</a>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg> Montana markets, USA</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg> Secure licensing</span>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="viu-footer__bottom">
+        <p class="viu-footer__copy">© 2026 VIU Real Estate Solutions. All rights reserved.</p>
+        <div class="viu-footer__legal">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Modal, single reusable ZIP-availability funnel (matches live site).
+       Opened by every CTA: nav "Check Territory", pricing "Check ZIP
+       Availability", footer "Claim Your ZIP Now", and the hero form.
+       ========================================================================== -->
+  <div class="viu-modal" data-viu-modal data-step="zip-search" hidden>
+    <div class="viu-modal__backdrop" data-viu-modal-close></div>
+    <div class="viu-modal__panel" role="dialog" aria-modal="true" aria-label="Check ZIP availability">
+      <button type="button" class="viu-modal__close" data-viu-modal-close aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+
+      <!-- STEP: zip-search -->
+      <div class="viu-modal__step viu-modal__step--zip viu-modal__pad">
+        <div class="viu-modal__head">
+          <span class="viu-modal__icon viu-modal__icon--orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+          </span>
+          <h3 class="viu-modal__title">Check ZIP availability</h3>
+          <p class="viu-modal__sub">Enter your desired ZIP code to check territory availability.</p>
+        </div>
+        <div class="viu-modal__body">
+          <label class="u-visually-hidden" for="modal-zip">ZIP code</label>
+          <input class="viu-modal__zip" id="modal-zip" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code" data-viu-zip-input data-viu-modal-zip />
+          <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-check>Check availability</button>
+          <p class="viu-modal__error" data-viu-modal-error hidden></p>
+        </div>
+      </div>
+
+      <!-- STEP: available -->
+      <div class="viu-modal__step viu-modal__step--available">
+        <div class="viu-modal__price-head">
+          <div class="viu-modal__avail">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+            <span>ZIP <span data-viu-modal-zipout></span> is available!</span>
+          </div>
+          <div class="viu-modal__price"><b>$199</b><span>/mo</span></div>
+          <span class="viu-modal__per">Per ZIP code</span>
+        </div>
+        <form class="viu-modal__lead" data-viu-modal-lead data-endpoint="">
+          <h3>Secure your territory</h3>
+          <p class="viu-modal__lead-sub">Fill in your details and our team will set up your exclusive ZIP territory.</p>
+          <input class="viu-input" name="name" type="text" placeholder="Full name *" aria-label="Full name" required />
+          <input class="viu-input" name="email" type="email" placeholder="Email address *" aria-label="Email address" required />
+          <input class="viu-input" name="phone" type="tel" placeholder="Phone number" aria-label="Phone number" />
+          <input class="viu-input" name="company" type="text" placeholder="Company / brokerage" aria-label="Company or brokerage" />
+          <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Claim territory</button>
+          <p class="viu-modal__error" data-viu-modal-lead-error hidden></p>
+          <p class="viu-modal__fine">Locked-in pricing for the duration of your active status. Cancel anytime.</p>
+        </form>
+      </div>
+
+      <!-- STEP: success -->
+      <div class="viu-modal__step viu-modal__step--success viu-modal__pad">
+        <span class="viu-modal__icon viu-modal__icon--success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+        </span>
+        <h3 class="viu-modal__title">Territory claimed!</h3>
+        <p class="viu-modal__msg">ZIP code <strong data-viu-modal-zipout></strong> has been reserved for you.</p>
+        <p class="viu-modal__msg viu-modal__msg--sm">A territory specialist will contact you within 24 hours to complete your onboarding.</p>
+        <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
+      </div>
+
+      <!-- STEP: unavailable -->
+      <div class="viu-modal__step viu-modal__step--unavailable viu-modal__pad">
+        <span class="viu-modal__icon viu-modal__icon--warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        </span>
+        <h3 class="viu-modal__title">ZIP taken</h3>
+        <p class="viu-modal__msg viu-modal__msg--sm">ZIP code <strong data-viu-modal-zipout></strong> is currently owned by another agent. Try a different ZIP code.</p>
+        <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-retry>Try another ZIP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       Contact modal, opened by the CTA "Contact Specialist" button.
+       Reuses the .viu-modal shell; form → success.
+       ========================================================================== -->
+  <div class="viu-modal" data-viu-contact-modal data-step="form" hidden>
+    <div class="viu-modal__backdrop" data-viu-modal-close></div>
+    <div class="viu-modal__panel" role="dialog" aria-modal="true" aria-label="Contact a specialist">
+      <button type="button" class="viu-modal__close" data-viu-modal-close aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+
+      <!-- STEP: form -->
+      <div class="viu-modal__step viu-modal__step--form viu-modal__pad">
+        <div class="viu-modal__head">
+          <span class="viu-modal__icon viu-modal__icon--orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          </span>
+          <h3 class="viu-modal__title">Contact a specialist</h3>
+          <p class="viu-modal__sub">Tell us about your market and our team will be in touch shortly.</p>
+        </div>
+        <form class="viu-contact" data-viu-contact-form data-endpoint="">
+          <div class="viu-contact__grid">
+            <label class="u-visually-hidden" for="c-name">Full name</label>
+            <input class="viu-input" id="c-name" name="name" type="text" placeholder="Full name *" required />
+            <label class="u-visually-hidden" for="c-email">Email address</label>
+            <input class="viu-input" id="c-email" name="email" type="email" placeholder="Email address *" required />
+            <label class="u-visually-hidden" for="c-phone">Phone number</label>
+            <input class="viu-input" id="c-phone" name="phone" type="tel" placeholder="Phone number" />
+            <label class="u-visually-hidden" for="c-zip">ZIP code of interest</label>
+            <input class="viu-input" id="c-zip" name="zipCode" type="text" inputmode="numeric" maxlength="5" placeholder="ZIP code of interest" data-viu-zip-input />
+          </div>
+          <label class="u-visually-hidden" for="c-message">Message</label>
+          <textarea class="viu-input viu-textarea" id="c-message" name="message" rows="4" placeholder="How can we help you?"></textarea>
+          <button class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" type="submit">Send Message</button>
+          <p class="viu-modal__error" data-viu-contact-error hidden></p>
+        </form>
+      </div>
+
+      <!-- STEP: success -->
+      <div class="viu-modal__step viu-modal__step--success viu-modal__pad">
+        <span class="viu-modal__icon viu-modal__icon--success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+        </span>
+        <h3 class="viu-modal__title">Message sent!</h3>
+        <p class="viu-modal__msg viu-modal__msg--sm">Thank you, a territory specialist will contact you shortly.</p>
+        <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

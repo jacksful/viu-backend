@@ -23,7 +23,9 @@ class CmsHeroSectionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'CMS';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationParentItem = 'Home Page';
+
+    protected static ?int $navigationSort = 11;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 

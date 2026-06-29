@@ -23,7 +23,9 @@ class CmsStrategicWindowSectionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'CMS';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationParentItem = 'Home Page';
+
+    protected static ?int $navigationSort = 12;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 

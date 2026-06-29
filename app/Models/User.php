@@ -37,7 +37,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'status',
         'password',
         'remember_token',
-        'profile_photo_path'
+        'profile_photo_path',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
     ];
 
     /**
@@ -90,6 +93,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function zipcodeSubscriptions()
     {
         return $this->hasMany(UserZipcodeSubscription::class);
+    }
+
+    public function stripePayments()
+    {
+        return $this->hasMany(StripePayment::class);
     }
 
     /**

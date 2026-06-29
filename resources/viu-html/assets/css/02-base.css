@@ -1,0 +1,135 @@
+/* ==========================================================================
+   VIU DESIGN SYSTEM — 02 BASE
+   Reset, document defaults, base typography, and layout primitives.
+   Heading element rules live in a low-specificity layer-free block but are
+   kept minimal so component/utility classes can always override them
+   (this deliberately avoids the cascade bug found in the original build,
+   where unlayered h1/h2 rules silently beat utility classes).
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--viu-font-sans);
+  font-size: var(--viu-fs-base);
+  line-height: var(--viu-lh-body);
+  color: var(--viu-color-text);
+  background: var(--viu-color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* `clip` prevents horizontal scroll WITHOUT turning <body> into a scroll
+     container (which `hidden` would, breaking window.scrollTo / scroll math). */
+  overflow-x: clip;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-main {
+  flex: 1 1 auto;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--viu-color-accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   BASE TYPOGRAPHY
+   These set the family/weight/measure; per-element sizing is applied via the
+   type-scale helper classes so headings remain overridable.
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--viu-fw-bold);
+  color: var(--viu-color-primary);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Type-scale helpers — the canonical way to apply heading styles. */
+.viu-display {
+  font-size: var(--viu-fs-display);
+  line-height: var(--viu-lh-display);
+  letter-spacing: var(--viu-ls-display);
+  font-weight: var(--viu-fw-black);
+  
+}
+
+.viu-h2 {
+  font-size: var(--viu-fs-h2);
+  line-height: var(--viu-lh-heading);
+  letter-spacing: var(--viu-ls-heading);
+  font-weight: var(--viu-fw-bold);
+}
+
+.viu-h3 {
+  font-size: var(--viu-fs-h3);
+  line-height: var(--viu-lh-snug);
+  letter-spacing: var(--viu-ls-tight);
+  font-weight: var(--viu-fw-bold);
+  
+}
+
+.viu-eyebrow {
+  font-size: var(--viu-fs-sm);
+  font-weight: var(--viu-fw-semibold);
+  letter-spacing: var(--viu-ls-label);
+  line-height: 1.4;
+}
+
+.viu-lead {
+  font-size: var(--viu-fs-lg);
+  line-height: var(--viu-lh-body);
+}
+
+/* Accent color helpers for headline fragments */
+.viu-accent { color: var(--viu-color-accent); }
+.viu-on-dark { color: var(--viu-color-on-primary); }

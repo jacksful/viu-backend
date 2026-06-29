@@ -119,6 +119,16 @@ class LeadController extends Controller
             ], 200);
         }
 
+        if (! $zipcode->hasPurchasablePlans()) {
+            return response()->json([
+                'available' => false,
+                'is_in_coverage_area' => true,
+                'message' => 'ZIP code is in our coverage area but Stripe subscription pricing is not configured yet.',
+            ], 200);
+        }
+
+        $purchasablePlans = $zipcode->purchasableBillingPlans();
+
         // Count leads/datasets for this zipcode (same logic as home route)
         $leadsCount = \App\Models\Dataset::whereHas('uploadedZipcode', function ($q) use ($zipcode) {
             $q->where('zipcode_id', $zipcode->id);
@@ -135,6 +145,8 @@ class LeadController extends Controller
                 'label' => "ZIP {$zipcode->code} - {$zipcode->city}, {$zipcode->state}",
                 'monthly_price' => $zipcode->monthly_price ?? 0,
                 'yearly_price' => $zipcode->yearly_price ?? 0,
+                'billing_plans' => $purchasablePlans,
+                'default_billing_interval' => collect($purchasablePlans)->value('interval'),
                 'leads_count' => $leadsCount > 0 ? $leadsCount : rand(50, 300),
             ],
         ], 200);
