@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class AboutHub extends Page
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationLabel = 'About';
 
     protected static ?string $title = 'About';

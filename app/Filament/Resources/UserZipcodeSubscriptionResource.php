@@ -114,6 +114,7 @@ class UserZipcodeSubscriptionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['user', 'customerIntake.zipcode']))
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
@@ -215,6 +216,19 @@ class UserZipcodeSubscriptionResource extends Resource
                     ->formatStateUsing(fn(string $state): string => ucfirst($state))
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('customerIntake.submitted_at')
+                    ->label('Intake')
+                    ->badge()
+                    ->getStateUsing(fn (UserZipcodeSubscription $record): string => $record->customerIntake?->isSubmitted()
+                        ? 'Submitted'
+                        : ($record->customerIntake ? 'Draft' : 'Not started'))
+                    ->color(fn (string $state): string => match ($state) {
+                        'Submitted' => 'success',
+                        'Draft' => 'warning',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime('M j, Y')
@@ -299,6 +313,24 @@ class UserZipcodeSubscriptionResource extends Resource
                     ),
             ])
             ->actions([
+                Actions\Action::make('viewIntake')
+                    ->label('Intake')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->color('info')
+                    ->visible(fn (UserZipcodeSubscription $record): bool => $record->customerIntake?->isSubmitted() ?? false)
+                    ->modalHeading(fn (UserZipcodeSubscription $record): string => "Intake: {$record->customerIntake->full_name}")
+                    ->modalWidth('5xl')
+                    ->modalContent(function (UserZipcodeSubscription $record) {
+                        $record->loadMissing('user', 'customerIntake.zipcode');
+
+                        return view('filament.resources.user-zipcode-subscription.intake-modal', [
+                            'subscription' => $record,
+                            'intake' => $record->customerIntake,
+                        ]);
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close'),
+
                 Actions\Action::make('toggleStatus')
                     ->label(
                         fn(UserZipcodeSubscription $record): string =>

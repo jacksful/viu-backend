@@ -296,6 +296,10 @@
                                 <i class="fas fa-credit-card w-5 text-gray-400"></i>
                                 <span>Subscription</span>
                             </button>
+                            <button @click="open = false; $dispatch('open-password-modal')" class="w-full flex items-center space-x-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors">
+                                <i class="fas fa-lock w-5 text-gray-400"></i>
+                                <span>Change Password</span>
+                            </button>
                             <a href="{{ route('user.settings') }}" class="flex items-center space-x-3 px-2 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors">
                                 <i class="fas fa-cog w-5 text-gray-400"></i>
                                 <span>Settings</span>

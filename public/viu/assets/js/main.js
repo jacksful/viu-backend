@@ -315,7 +315,14 @@
     var leadForm  = $('[data-viu-modal-lead]', modal);
     var leadError = $('[data-viu-modal-lead-error]', modal);
     var leadBtn   = leadForm ? $('button[type="submit"]', leadForm) : null;
+    var contactForm  = $('[data-viu-modal-contact]', modal);
+    var contactError = $('[data-viu-modal-contact-error]', modal);
+    var contactBtn   = contactForm ? $('button[type="submit"]', contactForm) : null;
+    var contactMsgEl = $('[data-viu-modal-contact-message]', modal);
+    var unavailableMsgEl = $('[data-viu-modal-unavailable-message]', modal);
+    var contactZipInput = contactForm ? $('input[name="zipCode"]', contactForm) : null;
     var currentZipcode = null;
+    var currentZip = '';
     var selectedBillingInterval = 'month';
 
     var setStep = function (step) { modal.setAttribute('data-step', step); };
@@ -337,6 +344,7 @@
           body: JSON.stringify({ zipcode: zip }),
         }).then(parseJsonResponse);
       }).then(function (data) {
+        currentZip = zip;
         setZipOut(zip);
         if (data && data.available && data.zipcode) {
           currentZipcode = data.zipcode;
@@ -344,8 +352,23 @@
             selectedBillingInterval = interval;
           });
           setStep('available');
+        } else if (data && data.is_in_coverage_area) {
+          currentZipcode = null;
+          if (contactMsgEl) {
+            contactMsgEl.textContent = data.message || ('ZIP code ' + zip + ' is currently unavailable. Contact us and we will follow up.');
+          }
+          if (contactZipInput) contactZipInput.value = zip;
+          if (contactForm) contactForm.reset();
+          if (contactZipInput) contactZipInput.value = zip;
+          showErr(contactError, '');
+          setStep('contact');
         } else {
           currentZipcode = null;
+          if (unavailableMsgEl) {
+            unavailableMsgEl.textContent = (data && data.message)
+              ? data.message
+              : 'ZIP code ' + zip + ' is not in our coverage area. Try a different ZIP code.';
+          }
           setStep('unavailable');
         }
       }).catch(function (err) { showErr(errorEl, err.message || 'Network error. Please try again.'); });
@@ -355,12 +378,13 @@
     var open = function (prefill) {
       if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
       currentZipcode = null;
+      currentZip = '';
       selectedBillingInterval = 'month';
       modalEnter();
       modal.hidden = false;
       document.body.classList.add('viu-modal-open');
       setStep('zip-search');
-      showErr(errorEl, ''); showErr(leadError, '');
+      showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
       if (zipInput && typeof prefill === 'string') zipInput.value = prefill.replace(/\D/g, '').slice(0, 5);
       if (zipInput) setTimeout(function () { zipInput.focus(); }, 50);
       if (zipInput && /^\d{5}$/.test(zipInput.value)) check();
@@ -373,10 +397,12 @@
       resetTimer = setTimeout(function () {
         setStep('zip-search');
         currentZipcode = null;
+        currentZip = '';
         selectedBillingInterval = 'month';
         if (zipInput) zipInput.value = '';
         if (leadForm) leadForm.reset();
-        showErr(errorEl, ''); showErr(leadError, '');
+        if (contactForm) contactForm.reset();
+        showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
         resetTimer = null;
       }, 250);
     };
@@ -444,14 +470,46 @@
       }).catch(function (err) { showErr(leadError, err.message || 'Network error. Please try again.'); });
     });
 
+    if (contactForm) contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fd = new FormData(contactForm);
+      var data = {};
+      fd.forEach(function (v, k) { data[k] = v; });
+      if (!data.name || !data.email) { showErr(contactError, 'Name and email are required.'); return; }
+      showErr(contactError, '');
+      var endpoint = config.contactStoreUrl || contactForm.getAttribute('data-endpoint');
+      withLoading(contactBtn, function () {
+        if (!endpoint) return Promise.resolve();
+        var body = new FormData();
+        body.append('_token', config.csrfToken || '');
+        body.append('name', data.name || '');
+        body.append('email', data.email || '');
+        body.append('phone', data.phone || '');
+        body.append('zip_of_interest', data.zipCode || currentZip || '');
+        body.append('subject', 'ZIP territory inquiry');
+        body.append('message', data.message || ('Interested in ZIP ' + (data.zipCode || currentZip || '') + ' which is currently unavailable.'));
+        return fetch(endpoint, {
+          method: 'POST',
+          headers: csrfHeaders(),
+          body: body,
+        }).then(parseJsonResponse);
+      }).then(function () { setStep('contact-success'); })
+        .catch(function (err) { showErr(contactError, err.message || 'Network error. Please try again.'); });
+    });
+
     $$('[data-viu-modal-close]', modal).forEach(function (el) { el.addEventListener('click', close); });
-    var retry = $('[data-viu-modal-retry]', modal);
-    if (retry) retry.addEventListener('click', function () {
+    var retryToZipSearch = function () {
       setStep('zip-search');
       currentZipcode = null;
+      currentZip = '';
       selectedBillingInterval = 'month';
+      showErr(contactError, '');
       if (zipInput) { zipInput.value = ''; zipInput.focus(); }
-    });
+    };
+    var retry = $('[data-viu-modal-retry]', modal);
+    if (retry) retry.addEventListener('click', retryToZipSearch);
+    var retryContact = $('[data-viu-modal-retry-contact]', modal);
+    if (retryContact) retryContact.addEventListener('click', retryToZipSearch);
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !modal.hidden) close();
     });

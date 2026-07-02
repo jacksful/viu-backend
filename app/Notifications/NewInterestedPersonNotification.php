@@ -24,29 +24,12 @@ class NewInterestedPersonNotification extends Notification
     {
         $contact = $this->contact;
 
-        $mail = (new MailMessage)
+        return (new MailMessage)
             ->subject('New Interested Person: '.$contact->name)
-            ->greeting('New submission received')
-            ->line('Someone has expressed interest through the website form.')
-            ->line('**Name:** '.$contact->name)
-            ->line('**Email:** '.$contact->email);
-
-        if ($contact->phone) {
-            $mail->line('**Phone:** '.$contact->phone);
-        }
-
-        if ($contact->zip_of_interest) {
-            $mail->line('**ZIP of interest:** '.$contact->zip_of_interest);
-        }
-
-        if ($contact->message) {
-            $mail->line('**Message:**')
-                ->line($contact->message);
-        }
-
-        return $mail
-            ->action('View in Admin', ContactResource::getUrl('index', panel: 'admin'))
-            ->salutation('Regards, '.config('app.name'));
+            ->view('emails.admin-new-interested-person', [
+                'contact' => $contact,
+                'adminUrl' => ContactResource::getUrl('index', panel: 'admin'),
+            ]);
     }
 
     /**

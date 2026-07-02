@@ -103,6 +103,7 @@ class LeadController extends Controller
             return response()->json([
                 'available' => false,
                 'is_in_coverage_area' => false,
+                'is_purchasable' => false,
                 'message' => 'ZIP code not available in our coverage area.',
             ], 200);
         }
@@ -115,15 +116,17 @@ class LeadController extends Controller
             return response()->json([
                 'available' => false,
                 'is_in_coverage_area' => true,
-                'message' => "ZIP code " . $zipcodeCode . " is currently owned by another agent. Try a different ZIP code.",
+                'is_purchasable' => true,
+                'message' => "ZIP code " . $zipcodeCode . " is currently owned by another agent. Try a different ZIP code Or fill out the form below to be notified when it becomes available.",
             ], 200);
         }
 
         if (! $zipcode->hasPurchasablePlans()) {
             return response()->json([
-                'available' => false,
+                'available' => true,
                 'is_in_coverage_area' => true,
-                'message' => 'ZIP code is in our coverage area but Stripe subscription pricing is not configured yet.',
+                'is_purchasable' => false,
+                'message' => 'ZIP code is ready for purchase!',
             ], 200);
         }
 

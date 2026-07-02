@@ -1,1 +1,1 @@
-<img src="{{ asset('image/logo-viu.png') }}" alt="Logo">
+<img src="{{ \App\Support\SiteSettings::adminPanelLogoUrl() }}" alt="{{ \App\Support\SiteSettings::siteName() }}">

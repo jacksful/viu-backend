@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsAboutMissionSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsAboutMissionSection::class;
 
     protected static ?string $navigationLabel = 'Mission';

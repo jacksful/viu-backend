@@ -4,14 +4,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Public CMS API cache TTL
+    | Page builder
     |--------------------------------------------------------------------------
     |
-    | Seconds to remember the aggregated /api/cms payload. Cache is also
-    | cleared whenever a CMS section model is saved in the admin.
+    | When enabled, public routes render CMS pages from the pages / page_sections
+    | tables instead of hardcoded views and singleton section models.
     |
     */
 
-    'api_cache_ttl' => max(1, (int) env('CMS_API_CACHE_TTL', 3600)),
+    'use_page_builder' => env('CMS_USE_PAGE_BUILDER', true),
+
+    'reserved_slugs' => [
+        'admin',
+        'user',
+        'stripe',
+        'intake',
+    ],
+
+    'header_section_links' => [
+        ['label' => 'The advantage', 'url' => '/#advantage'],
+        ['label' => 'Territory', 'url' => '/#territory'],
+        ['label' => 'Exclusivity', 'url' => '/#exclusivity'],
+        ['label' => 'Pricing', 'url' => '/#pricing'],
+    ],
+
+    'footer_section_links' => [
+        ['label' => 'The advantage', 'url' => '/#advantage'],
+        ['label' => 'Territory', 'url' => '/#territory'],
+        ['label' => 'Exclusivity', 'url' => '/#exclusivity'],
+        ['label' => 'Pricing', 'url' => '/#pricing'],
+    ],
 
 ];

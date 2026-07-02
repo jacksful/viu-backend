@@ -1,45 +1,58 @@
 @php
     $home = url('/');
+    $siteName = \App\Support\SiteSettings::siteName();
+    $siteTagline = \App\Support\SiteSettings::siteTagline();
+    $supportEmail = \App\Support\SiteSettings::supportEmail();
+    $phoneNumber = \App\Support\SiteSettings::phoneNumber();
+    $address = \App\Support\SiteSettings::address();
+    $footerNavLinks = $footerNavLinks ?? \App\Cms\Support\SiteNavigation::footerLinks();
+    $copyrightNavLinks = $copyrightNavLinks ?? \App\Cms\Support\SiteNavigation::copyrightLinks();
 @endphp
 <footer class="site-footer" id="contact">
     <div class="container">
         <div class="viu-footer__grid">
             <div class="viu-footer__brand">
-                <img src="{{ asset('viu/assets/images/logo-white.svg') }}" alt="{{ config('app.name', 'VIU') }}" />
-                <p class="viu-footer__desc">
-                    Predictive brand positioning for elite real estate professionals. Our
-                    technology identifies intent before search patterns emerge, securing your
-                    territory while others are still waiting for listings.
-                </p>
-                <div class="viu-footer__social">
-                    <a href="#" aria-label="VIU on Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
-                    <a href="#" aria-label="VIU on X"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg></a>
-                    <a href="#" aria-label="VIU on LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a>
-                </div>
+                <img src="{{ \App\Support\SiteSettings::footerLogoUrl() }}" alt="{{ $siteName }}" />
+                @if ($siteTagline)
+                    <p class="viu-footer__desc">{{ $siteTagline }}</p>
+                @else
+                    <p class="viu-footer__desc">
+                        Predictive brand positioning for elite real estate professionals. Our
+                        technology identifies intent before search patterns emerge, securing your
+                        territory while others are still waiting for listings.
+                    </p>
+                @endif
+                @include('components.social-links')
             </div>
 
             <nav class="viu-footer__col" aria-label="Footer">
                 <h3 class="viu-footer__col-title">Explore</h3>
-                <a href="{{ $home }}#advantage">The advantage</a>
-                <a href="{{ $home }}#territory">Territory</a>
-                <a href="{{ $home }}#exclusivity">Exclusivity</a>
-                <a href="{{ $home }}#pricing">Pricing</a>
-                <a href="{{ route('about') }}">About</a>
+                @foreach ($footerNavLinks as $link)
+                    <a href="{{ $link['url'] }}">{{ $link['label'] }}</a>
+                @endforeach
             </nav>
 
             <div class="viu-footer__col">
                 <h3 class="viu-footer__col-title">Contact</h3>
-                <a href="mailto:support@fullviu.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg> support@fullviu.com</a>
-                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg> Montana markets, USA</span>
+                @if ($supportEmail)
+                    <a href="mailto:{{ $supportEmail }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg> {{ $supportEmail }}</a>
+                @endif
+                @if ($phoneNumber)
+                    <a href="tel:{{ preg_replace('/[^\d+]/', '', $phoneNumber) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {{ $phoneNumber }}</a>
+                @endif
+                @if ($address)
+                    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg> {{ $address }}</span>
+                @endif
                 <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg> Secure licensing</span>
             </div>
         </div>
 
         <div class="viu-footer__bottom">
-            <p class="viu-footer__copy">© {{ date('Y') }} VIU Real Estate Solutions. All rights reserved.</p>
+            <p class="viu-footer__copy">© {{ date('Y') }} {{ $siteName }}. All rights reserved.</p>
             <div class="viu-footer__legal">
-                <a href="{{ route('privacy') }}">Privacy</a>
-                <a href="{{ route('terms') }}">Terms</a>
+                @foreach ($copyrightNavLinks as $link)
+                    <a href="{{ $link['url'] }}">{{ $link['label'] }}</a>
+                @endforeach
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@
     <div class="min-h-screen">
         @include('customer.partials.header')
         @include('customer.partials.profile-modal')
+        @include('customer.partials.password-modal')
         @include('customer.partials.subscription-modal')
         @include('customer.partials.feedback-modal')
         

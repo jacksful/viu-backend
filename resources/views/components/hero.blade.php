@@ -1,4 +1,7 @@
+@props(['section' => null])
+
 @php
+    $hero = $hero ?? $section ?? \App\Models\CmsHeroSection::singleton();
     $heroImageUrl = $hero->image_url ?? asset('viu/assets/images/hero-bg.jpg');
     $titleLines = array_values(array_filter(preg_split('/\r\n|\r|\n/', $hero->title ?? ''), fn ($line) => $line !== ''));
     if ($titleLines === []) {

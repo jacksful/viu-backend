@@ -69,6 +69,11 @@ class UserZipcodeSubscription extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function customerIntake()
+    {
+        return $this->hasOne(CustomerIntake::class, 'user_zipcode_subscription_id');
+    }
+
     /**
      * ACCESSORS & MUTATORS
      */
