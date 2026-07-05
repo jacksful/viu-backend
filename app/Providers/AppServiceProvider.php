@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Contact;
-use App\Models\EmailSetting;
-use App\Models\StripeSetting;
+use App\Cms\Support\SiteNavigation;
 use App\Models\CmsAboutHeroSection;
 use App\Models\CmsAboutMissionSection;
 use App\Models\CmsAboutPrinciplesSection;
@@ -14,9 +12,13 @@ use App\Models\CmsQaSection;
 use App\Models\CmsRecognitionSection;
 use App\Models\CmsStrategicWindowSection;
 use App\Models\CmsTerritoryZipSection;
+use App\Models\Contact;
+use App\Models\EmailSetting;
+use App\Models\StripeSetting;
 use App\Observers\ContactObserver;
 use App\Observers\InvalidateCmsApiCache;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -63,5 +65,13 @@ class AppServiceProvider extends ServiceProvider
         CmsAboutPrinciplesSection::observe($observer);
 
         Contact::observe(ContactObserver::class);
+
+        View::composer(['components.header', 'components.footer'], function ($view): void {
+            $view->with([
+                'headerNavLinks' => SiteNavigation::headerLinks(),
+                'footerNavLinks' => SiteNavigation::footerLinks(),
+                'copyrightNavLinks' => SiteNavigation::copyrightLinks(),
+            ]);
+        });
     }
 }

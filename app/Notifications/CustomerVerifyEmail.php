@@ -40,12 +40,13 @@ class CustomerVerifyEmail extends Notification
     $verificationUrl = $this->verificationUrl($notifiable);
 
     return (new MailMessage)
-      ->subject('Verify Email Address - Customer Portal')
-      ->greeting('Hello ' . $notifiable->first_name . '!')
-      ->line('Please click the button below to verify your email address.')
-      ->action('Verify Email Address', $verificationUrl)
-      ->line('If you did not create an account, no further action is required.')
-      ->salutation('Regards, ' . config('app.name'));
+      ->subject('Verify your email address')
+      ->view('emails.verify-email', [
+        'firstName' => $notifiable->first_name,
+        'email' => $notifiable->getEmailForVerification(),
+        'verificationUrl' => $verificationUrl,
+        'expireMinutes' => Config::get('auth.verification.expire', 60),
+      ]);
   }
 
   /**

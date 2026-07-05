@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsAboutPrinciplesSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsAboutPrinciplesSection::class;
 
     protected static ?string $navigationLabel = 'Principles';

@@ -100,6 +100,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->hasMany(StripePayment::class);
     }
 
+    public function customerIntakes()
+    {
+        return $this->hasMany(CustomerIntake::class);
+    }
+
     /**
      * Get all notifications for the user.
      */

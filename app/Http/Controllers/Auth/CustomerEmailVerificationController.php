@@ -3,28 +3,44 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerEmailVerificationController extends Controller
 {
-  /**
-   * Mark the authenticated user's email address as verified.
-   */
-  public function __invoke(EmailVerificationRequest $request): RedirectResponse
-  {
-    if ($request->user()->hasVerifiedEmail()) {
-      return redirect()->route('user.dashboard')->with('status', 'Email already verified.');
+    /**
+     * Mark the user's email as verified via signed verification link.
+     */
+    public function __invoke(Request $request, string $id, string $hash): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role !== 'customer') {
+            abort(403);
+        }
+
+        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            abort(403);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect()->route('user.dashboard')->with('status', 'Email already verified.');
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+            $user->update(['status' => 'active']);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('user.dashboard')->with('status', 'Email verified successfully!');
     }
-
-    if ($request->user()->markEmailAsVerified()) {
-      event(new Verified($request->user()));
-
-      // Update user status to active
-      $request->user()->update(['status' => 'active']);
-    }
-
-    return redirect()->route('user.dashboard')->with('status', 'Email verified successfully!');
-  }
 }

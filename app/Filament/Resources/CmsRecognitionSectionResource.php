@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsRecognitionSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsRecognitionSection::class;
 
     protected static ?string $navigationLabel = 'Brand authority';

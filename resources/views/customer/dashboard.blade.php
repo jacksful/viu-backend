@@ -12,6 +12,7 @@
 <body class="bg-gray-50" x-data="{ profileModalOpen: false }" @open-profile-modal.window="profileModalOpen = true" @close-profile-modal.window="profileModalOpen = false">
     @include('customer.partials.header')
     @include('customer.partials.profile-modal')
+    @include('customer.partials.password-modal')
     @include('customer.partials.subscription-modal')
     @include('customer.partials.feedback-modal')
 

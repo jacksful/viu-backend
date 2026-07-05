@@ -54,12 +54,48 @@
             <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
         </div>
 
+        <div class="viu-modal__step viu-modal__step--contact viu-modal__pad">
+            <div class="viu-modal__head">
+                <span class="viu-modal__icon viu-modal__icon--warn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                </span>
+                <h3 class="viu-modal__title">ZIP unavailable</h3>
+                <p class="viu-modal__sub" data-viu-modal-contact-message></p>
+            </div>
+            <form class="viu-contact" data-viu-modal-contact>
+                <div class="viu-contact__grid">
+                    <label class="u-visually-hidden" for="modal-contact-name">Full name</label>
+                    <input class="viu-input" id="modal-contact-name" name="name" type="text" placeholder="Full name *" required />
+                    <label class="u-visually-hidden" for="modal-contact-email">Email address</label>
+                    <input class="viu-input" id="modal-contact-email" name="email" type="email" placeholder="Email address *" required />
+                    <label class="u-visually-hidden" for="modal-contact-phone">Phone number</label>
+                    <input class="viu-input" id="modal-contact-phone" name="phone" type="tel" placeholder="Phone number" />
+                    <label class="u-visually-hidden" for="modal-contact-zip">ZIP code of interest</label>
+                    <input class="viu-input" id="modal-contact-zip" name="zipCode" type="text" inputmode="numeric" maxlength="5" placeholder="ZIP code of interest" data-viu-zip-input readonly />
+                </div>
+                <label class="u-visually-hidden" for="modal-contact-message">Message</label>
+                <textarea class="viu-input viu-textarea" id="modal-contact-message" name="message" rows="3" placeholder="Tell us about your market (optional)"></textarea>
+                <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Contact a specialist</button>
+                <p class="viu-modal__error" data-viu-modal-contact-error hidden></p>
+            </form>
+            <button type="button" class="viu-btn viu-btn--ghost viu-btn--md viu-btn--full viu-modal__retry" data-viu-modal-retry-contact>Try another ZIP</button>
+        </div>
+
+        <div class="viu-modal__step viu-modal__step--contact-success viu-modal__pad">
+            <span class="viu-modal__icon viu-modal__icon--success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+            </span>
+            <h3 class="viu-modal__title">Message sent!</h3>
+            <p class="viu-modal__msg viu-modal__msg--sm">Thank you. A territory specialist will contact you about ZIP <strong data-viu-modal-zipout></strong>.</p>
+            <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
+        </div>
+
         <div class="viu-modal__step viu-modal__step--unavailable viu-modal__pad">
             <span class="viu-modal__icon viu-modal__icon--warn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
             </span>
-            <h3 class="viu-modal__title">ZIP taken</h3>
-            <p class="viu-modal__msg viu-modal__msg--sm">ZIP code <strong data-viu-modal-zipout></strong> is currently owned by another agent. Try a different ZIP code.</p>
+            <h3 class="viu-modal__title">Outside coverage area</h3>
+            <p class="viu-modal__msg viu-modal__msg--sm" data-viu-modal-unavailable-message></p>
             <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-retry>Try another ZIP</button>
         </div>
     </div>

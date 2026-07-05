@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsTerritoryZipSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsTerritoryZipSection::class;
 
     protected static ?string $navigationLabel = 'Territory lock';

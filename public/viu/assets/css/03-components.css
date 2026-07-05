@@ -312,12 +312,16 @@
 /* Step visibility */
 .viu-modal__step { display: none; }
 .viu-modal__step--success,
+.viu-modal__step--contact-success,
 .viu-modal__step--unavailable { text-align: center; }
-.viu-modal[data-step="zip-search"]  .viu-modal__step--zip,
-.viu-modal[data-step="form"]        .viu-modal__step--form,
-.viu-modal[data-step="available"]   .viu-modal__step--available,
-.viu-modal[data-step="success"]     .viu-modal__step--success,
-.viu-modal[data-step="unavailable"] .viu-modal__step--unavailable { display: block; }
+.viu-modal[data-step="zip-search"]       .viu-modal__step--zip,
+.viu-modal[data-step="form"]             .viu-modal__step--form,
+.viu-modal[data-step="available"]        .viu-modal__step--available,
+.viu-modal[data-step="contact"]          .viu-modal__step--contact,
+.viu-modal[data-step="contact-success"]  .viu-modal__step--contact-success,
+.viu-modal[data-step="success"]          .viu-modal__step--success,
+.viu-modal[data-step="unavailable"]      .viu-modal__step--unavailable { display: block; }
+.viu-modal__retry { margin-top: 0.75rem; }
 
 /* Centered icon header (zip-search / success / unavailable) */
 .viu-modal__pad { padding: 1.25rem; }

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsHeroSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsHeroSection::class;
 
     protected static ?string $navigationLabel = 'Hero Section';

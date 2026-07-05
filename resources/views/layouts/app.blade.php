@@ -8,13 +8,20 @@
         document.documentElement.classList.remove('no-js');
         document.documentElement.classList.add('js');
     </script>
-    <title>@yield('title', config('app.name', 'VIU') . ' | Own the market before they sell')</title>
-    <meta name="description" content="Viu uses predictive modeling to place your brand in front of homeowners up to 90 days before they decide to sell, securing your position before search even begins." />
+    <title>@yield('title', \App\Support\TrackingSocialSettings::defaultMetaTitle() ?? \App\Support\SiteSettings::siteName() . (\App\Support\SiteSettings::siteTagline() ? ' | ' . \App\Support\SiteSettings::siteTagline() : ''))</title>
+    @include('components.tracking.verification-meta')
+    @hasSection('meta')
+        @yield('meta')
+    @else
+        @include('components.default-meta')
+    @endif
+
+    @include('components.tracking.head')
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
-    <link rel="icon" href="{{ asset('viu/assets/images/logo-dark.svg') }}" type="image/svg+xml" />
+    <link rel="icon" href="{{ \App\Support\SiteSettings::faviconUrl() }}" type="image/svg+xml" />
 
     <link rel="stylesheet" href="{{ asset('viu/assets/css/01-tokens.css') }}" />
     <link rel="stylesheet" href="{{ asset('viu/assets/css/02-base.css') }}" />
@@ -25,6 +32,7 @@
     @stack('styles')
 </head>
 <body class="@yield('body_class')">
+    @include('components.tracking.body')
     @include('components.header')
 
     <main class="site-main">

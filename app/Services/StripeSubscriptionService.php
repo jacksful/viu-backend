@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendWelcomeIntakeKickoffEmail;
 use App\Models\Lead;
 use App\Models\StripePayment;
 use App\Models\User;
@@ -151,7 +152,9 @@ class StripeSubscriptionService
             ?? ($subscriptionId ? $this->resolveBillingIntervalFromStripe($subscriptionId) : Zipcode::BILLING_MONTHLY);
         $stripeSubscription = $this->resolveStripeSubscription($session, $subscriptionId);
 
-        DB::transaction(function () use ($lead, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription): void {
+        $fulfilledPaymentId = null;
+
+        DB::transaction(function () use ($lead, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription, &$fulfilledPaymentId): void {
             if (! $this->isZipcodeAvailable($zipcode)) {
                 if ($subscriptionId) {
                     $this->stripe->client()->subscriptions->cancel($subscriptionId);
@@ -199,7 +202,15 @@ class StripeSubscriptionService
                     'status' => 'paid',
                     'paid_at' => now(),
                 ]);
+
+            $fulfilledPaymentId = StripePayment::query()
+                ->where('stripe_checkout_session_id', $session->id)
+                ->value('id');
         });
+
+        if ($fulfilledPaymentId) {
+            SendWelcomeIntakeKickoffEmail::dispatch($fulfilledPaymentId);
+        }
     }
 
     public function syncSubscriptionStatus(Subscription $subscription): void

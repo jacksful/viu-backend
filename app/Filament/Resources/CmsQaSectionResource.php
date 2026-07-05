@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CmsQaSectionResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = CmsQaSection::class;
 
     protected static ?string $navigationLabel = 'QA Section';

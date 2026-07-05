@@ -1,18 +1,18 @@
 @php
     $home = url('/');
+    $siteName = \App\Support\SiteSettings::siteName();
+    $headerNavLinks = $headerNavLinks ?? \App\Cms\Support\SiteNavigation::headerLinks();
 @endphp
 <header class="site-header" id="site-header" data-viu-header>
     <div class="container site-header__inner">
-        <a href="{{ $home }}" class="viu-nav__logo" aria-label="VIU home">
-            <img src="{{ asset('viu/assets/images/logo-white.svg') }}" alt="{{ config('app.name', 'VIU') }}" />
+        <a href="{{ $home }}" class="viu-nav__logo" aria-label="{{ $siteName }} home">
+            <img src="{{ \App\Support\SiteSettings::logoLightUrl() }}" alt="{{ $siteName }}" />
         </a>
 
         <nav class="viu-nav__links" aria-label="Primary">
-            <a class="viu-nav__link" href="{{ $home }}#advantage">The advantage</a>
-            <a class="viu-nav__link" href="{{ $home }}#territory">Territory</a>
-            <a class="viu-nav__link" href="{{ $home }}#exclusivity">Exclusivity</a>
-            <a class="viu-nav__link" href="{{ $home }}#pricing">Pricing</a>
-            <a class="viu-nav__link" href="{{ route('about') }}">About</a>
+            @foreach ($headerNavLinks as $link)
+                <a class="viu-nav__link" href="{{ $link['url'] }}">{{ $link['label'] }}</a>
+            @endforeach
         </nav>
 
         <div class="viu-nav__cta">
@@ -26,11 +26,9 @@
 
     <div class="viu-nav__menu" id="mobile-menu">
         <nav class="container viu-nav__menu-inner" aria-label="Mobile">
-            <a class="viu-nav__link" href="{{ $home }}#advantage" data-viu-nav-close>The advantage</a>
-            <a class="viu-nav__link" href="{{ $home }}#territory" data-viu-nav-close>Territory</a>
-            <a class="viu-nav__link" href="{{ $home }}#exclusivity" data-viu-nav-close>Exclusivity</a>
-            <a class="viu-nav__link" href="{{ $home }}#pricing" data-viu-nav-close>Pricing</a>
-            <a class="viu-nav__link" href="{{ route('about') }}" data-viu-nav-close>About</a>
+            @foreach ($headerNavLinks as $link)
+                <a class="viu-nav__link" href="{{ $link['url'] }}" data-viu-nav-close>{{ $link['label'] }}</a>
+            @endforeach
             <button type="button" class="viu-btn viu-btn--primary viu-btn--sm viu-btn--full" data-viu-modal-open data-viu-nav-close>Check territory</button>
         </nav>
     </div>
