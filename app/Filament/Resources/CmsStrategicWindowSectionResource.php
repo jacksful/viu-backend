@@ -7,6 +7,7 @@ use App\Models\CmsStrategicWindowSection;
 use Filament\Forms\Components;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components as SchemaComponents;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,9 @@ class CmsStrategicWindowSectionResource extends Resource
     {
         return $schema
             ->schema([
-                SchemaComponents\Section::make('Left column')
+                Grid::make(2)
+                    ->schema([
+                        SchemaComponents\Section::make('Left column')
                     ->schema([
                         Components\TextInput::make('badge_text')
                             ->label('Badge')
@@ -88,7 +91,7 @@ class CmsStrategicWindowSectionResource extends Resource
                     ])
                     ->columns(2),
 
-                SchemaComponents\Section::make('Right column (image & card)')
+                        SchemaComponents\Section::make('Right column (image & card)')
                     ->schema([
                         Components\FileUpload::make('visual_image_path')
                             ->label('Background image')
@@ -137,6 +140,7 @@ class CmsStrategicWindowSectionResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
+                    ]),
             ]);
     }
 

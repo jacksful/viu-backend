@@ -7,6 +7,7 @@ use App\Models\CmsPricingSection;
 use Filament\Forms\Components;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components as SchemaComponents;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,9 @@ class CmsPricingSectionResource extends Resource
     {
         return $schema
             ->schema([
-                SchemaComponents\Section::make('Left column (image & price card)')
+                Grid::make(2)
+                    ->schema([
+                        SchemaComponents\Section::make('Left column (image & price card)')
                     ->schema([
                         Components\FileUpload::make('left_image_path')
                             ->label('Background image')
@@ -76,7 +79,7 @@ class CmsPricingSectionResource extends Resource
                     ])
                     ->columns(2),
 
-                SchemaComponents\Section::make('Right column (copy & CTA)')
+                        SchemaComponents\Section::make('Right column (copy & CTA)')
                     ->schema([
                         Components\TextInput::make('badge_text')
                             ->label('Badge')
@@ -124,6 +127,7 @@ class CmsPricingSectionResource extends Resource
                             ->helperText('Anchor (e.g. #hero-zip) or full URL.'),
                     ])
                     ->columns(2),
+                    ]),
             ]);
     }
 

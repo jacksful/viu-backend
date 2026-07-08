@@ -7,6 +7,7 @@ use App\Models\CmsTerritoryZipSection;
 use Filament\Forms\Components;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components as SchemaComponents;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,9 @@ class CmsTerritoryZipSectionResource extends Resource
     {
         return $schema
             ->schema([
-                SchemaComponents\Section::make('Left column (image & status card)')
+                Grid::make(2)
+                    ->schema([
+                        SchemaComponents\Section::make('Left column (image & status card)')
                     ->schema([
                         Components\FileUpload::make('left_visual_image_path')
                             ->label('Background image')
@@ -94,7 +97,7 @@ class CmsTerritoryZipSectionResource extends Resource
                             ->columnSpanFull(),
                     ]),
 
-                SchemaComponents\Section::make('Right column (copy, icons, quote)')
+                        SchemaComponents\Section::make('Right column (copy, icons, quote)')
                     ->schema([
                         Components\TextInput::make('badge_text')
                             ->label('Top badge')
@@ -155,6 +158,7 @@ class CmsTerritoryZipSectionResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
+                    ]),
             ]);
     }
 
