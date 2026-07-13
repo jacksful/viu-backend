@@ -2,6 +2,9 @@
 <div x-data="{
     subscriptionModalOpen: false,
     subscriptionLoading: false,
+    actionLoading: null,
+    actionMessage: '',
+    actionError: '',
     subscriptionData: {
         memberSince: '',
         subscriptionStart: '',
@@ -14,6 +17,8 @@
     },
     async loadSubscriptionData() {
         this.subscriptionLoading = true;
+        this.actionMessage = '';
+        this.actionError = '';
         try {
             const response = await fetch('{{ route('user.subscription.data') }}', {
                 headers: {
@@ -29,6 +34,64 @@
             console.error('Error loading subscription data:', error);
         } finally {
             this.subscriptionLoading = false;
+        }
+    },
+    async cancelSubscription(subscriptionId) {
+        if (! confirm('Cancel this ZIP subscription at the end of your current billing period? You will keep full access until then.')) {
+            return;
+        }
+
+        await this.performSubscriptionAction(subscriptionId, 'cancel');
+    },
+    async reactivateSubscription(subscriptionId) {
+        await this.performSubscriptionAction(subscriptionId, 'reactivate');
+    },
+    async upgradeSubscription(subscriptionId, interval) {
+        const zipcode = this.subscriptionData.zipcodes.find(z => z.subscription_id === subscriptionId);
+        const label = zipcode?.upgrade_option?.action_label || 'change your plan';
+
+        if (! confirm('Confirm ' + label.toLowerCase() + '? Stripe will prorate the difference on your next invoice.')) {
+            return;
+        }
+
+        await this.performSubscriptionAction(subscriptionId, 'upgrade', { billing_interval: interval });
+    },
+    async performSubscriptionAction(subscriptionId, action, body = null) {
+        this.actionLoading = subscriptionId + ':' + action;
+        this.actionMessage = '';
+        this.actionError = '';
+
+        const routes = {
+            cancel: '{{ url('/user/subscription') }}/' + subscriptionId + '/cancel',
+            reactivate: '{{ url('/user/subscription') }}/' + subscriptionId + '/reactivate',
+            upgrade: '{{ url('/user/subscription') }}/' + subscriptionId + '/upgrade',
+        };
+
+        try {
+            const response = await fetch(routes[action], {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: body ? JSON.stringify(body) : null,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.actionMessage = data.message || 'Subscription updated successfully.';
+                await this.loadSubscriptionData();
+            } else {
+                this.actionError = data.message || 'Unable to update subscription.';
+            }
+        } catch (error) {
+            console.error('Subscription action failed:', error);
+            this.actionError = 'Something went wrong. Please try again.';
+        } finally {
+            this.actionLoading = null;
         }
     }
 }" 
@@ -76,6 +139,10 @@
             
             <!-- Modal Body -->
             <div class="px-6 py-6">
+                <!-- Action feedback -->
+                <div x-show="actionMessage" x-cloak class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" x-text="actionMessage"></div>
+                <div x-show="actionError" x-cloak class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" x-text="actionError"></div>
+
                 <!-- Loading State -->
                 <div x-show="subscriptionLoading" class="text-center py-12">
                     <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
@@ -121,7 +188,7 @@
                     <!-- Subscription ZIP Codes Section -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-gray-900 mb-4">Subscription ZIP Codes</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <template x-for="zipcode in subscriptionData.zipcodes" :key="zipcode.id">
                                 <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                                     <div class="flex items-start space-x-3">
@@ -129,11 +196,50 @@
                                             <i class="fas fa-map-marker-alt text-blue-600"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900" x-text="'ZIP ' + zipcode.code"></p>
-                                            <p class="text-xs text-gray-600 mt-1" x-text="zipcode.city + ', ' + zipcode.state"></p>
+                                            <div class="flex items-start justify-between gap-2">
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-900" x-text="'ZIP ' + zipcode.code"></p>
+                                                    <p class="text-xs text-gray-600 mt-1" x-text="zipcode.city + ', ' + zipcode.state"></p>
+                                                </div>
+                                                <span x-show="zipcode.cancel_at_period_end"
+                                                      class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                                                    Canceling
+                                                </span>
+                                            </div>
                                             <p class="text-sm font-medium text-gray-900 mt-2" x-text="zipcode.price ? ('$' + zipcode.price + (zipcode.price_label || '/month')) : '—'"></p>
                                             <p class="text-xs text-gray-500 mt-2" x-show="zipcode.subscription_start" x-text="'Start: ' + zipcode.subscription_start"></p>
                                             <p class="text-xs text-gray-500" x-show="zipcode.subscription_end" x-text="'End: ' + zipcode.subscription_end"></p>
+
+                                            <div class="mt-4 flex flex-wrap gap-2">
+                                                <button type="button"
+                                                        x-show="zipcode.upgrade_option"
+                                                        @click="upgradeSubscription(zipcode.subscription_id, zipcode.upgrade_option.interval)"
+                                                        :disabled="actionLoading"
+                                                        class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+                                                    <i class="fas fa-arrow-up mr-1" x-show="zipcode.upgrade_option && zipcode.upgrade_option.interval === 'year'"></i>
+                                                    <span x-text="zipcode.upgrade_option ? zipcode.upgrade_option.action_label : ''"></span>
+                                                </button>
+
+                                                <button type="button"
+                                                        x-show="zipcode.can_cancel"
+                                                        @click="cancelSubscription(zipcode.subscription_id)"
+                                                        :disabled="actionLoading"
+                                                        class="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50">
+                                                    Cancel Subscription
+                                                </button>
+
+                                                <button type="button"
+                                                        x-show="zipcode.can_reactivate"
+                                                        @click="reactivateSubscription(zipcode.subscription_id)"
+                                                        :disabled="actionLoading"
+                                                        class="inline-flex items-center rounded-md border border-green-300 bg-white px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-50 disabled:opacity-50">
+                                                    Keep Subscription
+                                                </button>
+                                            </div>
+
+                                            <p class="text-xs text-gray-500 mt-3" x-show="zipcode.cancel_at_period_end">
+                                                Access continues until <span x-text="zipcode.subscription_end"></span>, then this ZIP returns to the available pool.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -145,8 +251,8 @@
                                 </div>
                             </template>
                         </div>
-                        <p class="text-sm text-gray-500 italic">
-                            Contact your administrator to add or remove ZIP codes from your subscription.
+                        <p class="text-sm text-gray-500">
+                            Cancel anytime — you keep full ZIP data access until the end of your current billing period.
                         </p>
                     </div>
 
@@ -186,9 +292,6 @@
                                 </table>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-500 italic mt-4">
-                            Invoices are sent by your administrator. Contact them for billing questions.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -208,10 +311,3 @@
 <style>
     [x-cloak] { display: none !important; }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // This will be handled by Alpine.js in the parent component
-});
-</script>
-

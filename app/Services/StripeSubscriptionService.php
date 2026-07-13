@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Jobs\SendCancellationConfirmationEmail;
+use App\Jobs\SendPaymentFailedEmail;
+use App\Jobs\SendSubscriptionActiveEmail;
 use App\Jobs\SendWelcomeIntakeKickoffEmail;
 use App\Models\Lead;
 use App\Models\StripePayment;
@@ -237,11 +240,19 @@ class StripeSubscriptionService
             default => $localSubscription->status,
         };
 
+        $wasScheduledToCancel = (bool) $localSubscription->cancel_at_period_end;
+        $cancelAtPeriodEnd = (bool) ($subscription->cancel_at_period_end ?? false);
+
         $localSubscription->update([
             'status' => $status,
+            'cancel_at_period_end' => $cancelAtPeriodEnd,
         ]);
 
         $this->syncLocalSubscriptionPeriod($localSubscription, $subscription);
+
+        if (! $wasScheduledToCancel && $cancelAtPeriodEnd) {
+            SendCancellationConfirmationEmail::dispatch($localSubscription->id);
+        }
 
         if ($status === 'canceled' && $zipcodeId) {
             $lead = Lead::query()
@@ -276,7 +287,16 @@ class StripeSubscriptionService
         $billingInterval = $localSubscription?->billing_interval
             ?? ($invoice->metadata['billing_interval'] ?? Zipcode::BILLING_MONTHLY);
 
-        StripePayment::updateOrCreate(
+        $existingPayment = StripePayment::query()
+            ->where('stripe_invoice_id', $invoice->id)
+            ->first();
+
+        $metadata = array_merge(
+            $existingPayment?->metadata ?? [],
+            $invoice->metadata?->toArray() ?? [],
+        );
+
+        $payment = StripePayment::updateOrCreate(
             ['stripe_invoice_id' => $invoice->id],
             [
                 'user_id' => $localSubscription?->user_id,
@@ -295,7 +315,7 @@ class StripeSubscriptionService
                 'paid_at' => $invoice->status_transitions?->paid_at
                     ? now()->setTimestamp($invoice->status_transitions->paid_at)
                     : now(),
-                'metadata' => $invoice->metadata?->toArray() ?? [],
+                'metadata' => $metadata,
             ],
         );
 
@@ -305,6 +325,10 @@ class StripeSubscriptionService
             if ($stripeSubscription) {
                 $this->syncLocalSubscriptionPeriod($localSubscription, $stripeSubscription);
             }
+        }
+
+        if ($invoice->billing_reason === 'subscription_cycle') {
+            SendSubscriptionActiveEmail::dispatch($payment->id);
         }
     }
 
@@ -320,7 +344,16 @@ class StripeSubscriptionService
             ->where('stripe_subscription_id', $subscriptionId)
             ->first();
 
-        StripePayment::updateOrCreate(
+        $existingPayment = StripePayment::query()
+            ->where('stripe_invoice_id', $invoice->id)
+            ->first();
+
+        $metadata = array_merge(
+            $existingPayment?->metadata ?? [],
+            $invoice->metadata?->toArray() ?? [],
+        );
+
+        $payment = StripePayment::updateOrCreate(
             ['stripe_invoice_id' => $invoice->id],
             [
                 'user_id' => $localSubscription?->user_id,
@@ -334,9 +367,128 @@ class StripeSubscriptionService
                 'billing_reason' => $invoice->billing_reason,
                 'billing_interval' => $localSubscription?->billing_interval,
                 'customer_email' => $invoice->customer_email,
-                'metadata' => $invoice->metadata?->toArray() ?? [],
+                'metadata' => $metadata,
             ],
         );
+
+        SendPaymentFailedEmail::dispatch($payment->id);
+    }
+
+    public function cancelAtPeriodEnd(UserZipcodeSubscription $subscription): void
+    {
+        if (! $this->stripe->isEnabled()) {
+            throw new \RuntimeException('Stripe payments are not enabled.');
+        }
+
+        if (! $subscription->stripe_subscription_id) {
+            throw new \RuntimeException('This subscription is not linked to Stripe.');
+        }
+
+        if ($subscription->status !== 'active') {
+            throw new \RuntimeException('Only active subscriptions can be canceled.');
+        }
+
+        if ($subscription->cancel_at_period_end) {
+            throw new \RuntimeException('This subscription is already scheduled to cancel.');
+        }
+
+        $stripeSubscription = $this->stripe->client()->subscriptions->update(
+            $subscription->stripe_subscription_id,
+            ['cancel_at_period_end' => true],
+        );
+
+        $subscription->update(['cancel_at_period_end' => true]);
+        $this->syncLocalSubscriptionPeriod($subscription, $stripeSubscription);
+
+        SendCancellationConfirmationEmail::dispatch($subscription->id);
+    }
+
+    public function reactivateSubscription(UserZipcodeSubscription $subscription): void
+    {
+        if (! $this->stripe->isEnabled()) {
+            throw new \RuntimeException('Stripe payments are not enabled.');
+        }
+
+        if (! $subscription->stripe_subscription_id) {
+            throw new \RuntimeException('This subscription is not linked to Stripe.');
+        }
+
+        if (! $subscription->cancel_at_period_end) {
+            throw new \RuntimeException('This subscription is not scheduled to cancel.');
+        }
+
+        $stripeSubscription = $this->stripe->client()->subscriptions->update(
+            $subscription->stripe_subscription_id,
+            ['cancel_at_period_end' => false],
+        );
+
+        $subscription->update([
+            'cancel_at_period_end' => false,
+            'cancellation_confirmation_sent_at' => null,
+        ]);
+        $this->syncLocalSubscriptionPeriod($subscription, $stripeSubscription);
+    }
+
+    public function upgradeBillingInterval(UserZipcodeSubscription $subscription, string $newInterval): void
+    {
+        if (! $this->stripe->isEnabled()) {
+            throw new \RuntimeException('Stripe payments are not enabled.');
+        }
+
+        if (! $subscription->stripe_subscription_id) {
+            throw new \RuntimeException('This subscription is not linked to Stripe.');
+        }
+
+        if ($subscription->status !== 'active') {
+            throw new \RuntimeException('Only active subscriptions can be upgraded.');
+        }
+
+        if ($subscription->cancel_at_period_end) {
+            throw new \RuntimeException('Reactivate your subscription before changing plans.');
+        }
+
+        $newInterval = $newInterval === Zipcode::BILLING_YEARLY
+            ? Zipcode::BILLING_YEARLY
+            : Zipcode::BILLING_MONTHLY;
+
+        if ($subscription->billing_interval === $newInterval) {
+            throw new \RuntimeException('You are already on this billing plan.');
+        }
+
+        $zipcodeId = $subscription->zipcode_ids[0] ?? null;
+        $zipcode = $zipcodeId ? Zipcode::query()->find($zipcodeId) : null;
+
+        if (! $zipcode) {
+            throw new \RuntimeException('ZIP code not found for this subscription.');
+        }
+
+        $stripePriceId = $zipcode->assertStripePriceForInterval($newInterval);
+
+        $stripeSubscription = $this->retrieveStripeSubscription($subscription->stripe_subscription_id);
+
+        if (! $stripeSubscription || empty($stripeSubscription->items->data)) {
+            throw new \RuntimeException('Unable to load Stripe subscription details.');
+        }
+
+        $subscriptionItemId = $stripeSubscription->items->data[0]->id;
+        $metadata = $stripeSubscription->metadata?->toArray() ?? [];
+
+        $updatedStripeSubscription = $this->stripe->client()->subscriptions->update(
+            $subscription->stripe_subscription_id,
+            [
+                'items' => [
+                    ['id' => $subscriptionItemId, 'price' => $stripePriceId],
+                ],
+                'proration_behavior' => 'create_prorations',
+                'metadata' => [
+                    ...$metadata,
+                    'billing_interval' => $newInterval,
+                ],
+            ],
+        );
+
+        $subscription->update(['billing_interval' => $newInterval]);
+        $this->syncLocalSubscriptionPeriod($subscription, $updatedStripeSubscription);
     }
 
     protected function resolveCustomerUser(Lead $lead, ?string $stripeCustomerId, ?string $email): User

@@ -121,6 +121,9 @@ Route::prefix('user')->group(function () {
             Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
             Route::get('/subscription', [SubscriptionController::class, 'index'])->name('subscription');
             Route::get('/subscription/data', [SubscriptionController::class, 'getData'])->name('subscription.data');
+            Route::post('/subscription/{subscription}/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+            Route::post('/subscription/{subscription}/reactivate', [SubscriptionController::class, 'reactivate'])->name('subscription.reactivate');
+            Route::post('/subscription/{subscription}/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
             Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 
             // Notification routes

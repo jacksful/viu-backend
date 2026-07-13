@@ -19,6 +19,7 @@ class Contact extends Model
         'subject',
         'message',
         'status',
+        'zip_available_notice_sent_for_subscription_id',
     ];
 
     /**

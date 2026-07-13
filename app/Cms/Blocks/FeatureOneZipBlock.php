@@ -5,7 +5,6 @@ namespace App\Cms\Blocks;
 use App\Cms\Enums\PageBlockType;
 use App\Cms\Presenters\TerritoryZipPresenter;
 use Filament\Forms\Components;
-use Filament\Schemas\Components as SchemaComponents;
 
 class FeatureOneZipBlock extends AbstractPageBlock
 {
@@ -21,8 +20,9 @@ class FeatureOneZipBlock extends AbstractPageBlock
 
     public static function schema(): array
     {
-        return [
-            SchemaComponents\Section::make('Left column')->schema([
+        return static::sideBySideColumns(
+            'Left column',
+            [
                 Components\FileUpload::make('left_visual_image_path')->label('Background image')->image()->disk('public')->directory('cms/territory-zip')->visibility('public')->maxSize(8192)->columnSpanFull(),
                 Components\FileUpload::make('left_card_icon_path')->label('Card icon')->image()->disk('public')->directory('cms/territory-zip/card')->visibility('public')->maxSize(1024)->columnSpanFull(),
                 Components\TextInput::make('card_kicker')->label('Card kicker')->maxLength(255),
@@ -36,8 +36,9 @@ class FeatureOneZipBlock extends AbstractPageBlock
                     ->minItems(1)
                     ->reorderable()
                     ->columnSpanFull(),
-            ])->columns(2),
-            SchemaComponents\Section::make('Right column')->schema([
+            ],
+            'Right column',
+            [
                 Components\TextInput::make('badge_text')->label('Badge')->required()->maxLength(255)->columnSpanFull(),
                 Components\TextInput::make('headline_primary')->label('Headline (navy line)')->required()->maxLength(255),
                 Components\TextInput::make('headline_accent')->label('Headline (accent line)')->required()->maxLength(255),
@@ -55,8 +56,8 @@ class FeatureOneZipBlock extends AbstractPageBlock
                     ->columnSpanFull(),
                 Components\FileUpload::make('quote_icon_path')->label('Quote icon')->image()->disk('public')->directory('cms/territory-zip/quote')->visibility('public')->maxSize(1024)->columnSpanFull(),
                 Components\Textarea::make('quote_text')->label('Quote text')->rows(2)->maxLength(1000)->columnSpanFull(),
-            ])->columns(2),
-        ];
+            ],
+        );
     }
 
     public static function presenter(array $content): object

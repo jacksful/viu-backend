@@ -6,7 +6,6 @@ use App\Cms\Enums\PageBlockType;
 use App\Cms\Presenters\PricingPresenter;
 use App\Cms\Support\PageRenderContext;
 use Filament\Forms\Components;
-use Filament\Schemas\Components as SchemaComponents;
 
 class PricingBlock extends AbstractPageBlock
 {
@@ -22,16 +21,18 @@ class PricingBlock extends AbstractPageBlock
 
     public static function schema(): array
     {
-        return [
-            SchemaComponents\Section::make('Left column')->schema([
+        return static::sideBySideColumns(
+            'Left column',
+            [
                 Components\FileUpload::make('left_image_path')->label('Background image')->image()->disk('public')->directory('cms/pricing')->visibility('public')->maxSize(8192)->columnSpanFull(),
                 Components\TextInput::make('card_label_starting')->label('Card top label')->required()->maxLength(255),
                 Components\TextInput::make('card_price_display')->label('Price display')->required()->maxLength(64),
                 Components\TextInput::make('card_price_period')->label('Price period')->required()->maxLength(32),
                 Components\TextInput::make('card_per_label')->label('Per-line label')->required()->maxLength(255),
                 Components\Textarea::make('card_footer_note')->label('Card footer note')->rows(2)->maxLength(1000)->columnSpanFull(),
-            ])->columns(2),
-            SchemaComponents\Section::make('Right column')->schema([
+            ],
+            'Right column',
+            [
                 Components\TextInput::make('badge_text')->label('Badge')->required()->maxLength(255)->columnSpanFull(),
                 Components\TextInput::make('heading')->label('Heading')->required()->maxLength(255),
                 Components\Textarea::make('intro')->label('Description')->rows(3)->maxLength(5000)->columnSpanFull(),
@@ -47,8 +48,8 @@ class PricingBlock extends AbstractPageBlock
                     ->columnSpanFull(),
                 Components\TextInput::make('cta_label')->label('Button label')->required()->maxLength(255),
                 Components\TextInput::make('cta_href')->label('Button link')->required()->maxLength(2048),
-            ])->columns(2),
-        ];
+            ],
+        );
     }
 
     public static function presenter(array $content): object

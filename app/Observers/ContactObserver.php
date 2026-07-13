@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendWaitlistConfirmationEmail;
 use App\Models\Contact;
 use App\Models\EmailSetting;
 use App\Notifications\NewInterestedPersonNotification;
@@ -12,6 +13,12 @@ use Throwable;
 class ContactObserver
 {
     public function created(Contact $contact): void
+    {
+        $this->notifyAdmin($contact);
+        $this->sendWaitlistConfirmation($contact);
+    }
+
+    private function notifyAdmin(Contact $contact): void
     {
         try {
             EmailSetting::applyMailConfig();
@@ -36,5 +43,14 @@ class ContactObserver
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function sendWaitlistConfirmation(Contact $contact): void
+    {
+        if (blank($contact->zip_of_interest) || blank($contact->email)) {
+            return;
+        }
+
+        SendWaitlistConfirmationEmail::dispatch($contact->id);
     }
 }

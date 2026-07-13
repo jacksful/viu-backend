@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\UserZipcodeSubscription;
 use App\Models\Zipcode;
+use App\Services\StripeSubscriptionService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController extends Controller
 {
+    public function __construct(
+        protected StripeSubscriptionService $stripeSubscriptions,
+    ) {}
+
     public function index()
     {
         $user = Auth::user();
@@ -20,7 +27,7 @@ class SubscriptionController extends Controller
         return view('customer.subscription', compact('subscriptions'));
     }
 
-    public function getData()
+    public function getData(): JsonResponse
     {
         $user = Auth::user();
 
@@ -37,9 +44,7 @@ class SubscriptionController extends Controller
         }
         $zipcodeIds = $zipcodeIds->unique()->values()->all();
 
-        $zipcodes = Zipcode::whereIn('id', $zipcodeIds)->get()->keyBy('id');
-
-        $subscriptionSummaries = $activeSubscriptions->map(function (UserZipcodeSubscription $subscription) use ($zipcodes) {
+        $subscriptionSummaries = $activeSubscriptions->map(function (UserZipcodeSubscription $subscription) {
             $subscriptionZipcodes = Zipcode::whereIn('id', $subscription->zipcode_ids ?? [])->get();
             $interval = $subscription->billing_interval ?: Zipcode::BILLING_MONTHLY;
             $amount = $subscriptionZipcodes->sum(function (Zipcode $zipcode) use ($interval): float {
@@ -118,6 +123,7 @@ class SubscriptionController extends Controller
             'totalMonthly' => number_format($totalMonthlyEquivalent, 2),
             'zipcodes' => $subscriptionSummaries->flatMap(function (array $summary) {
                 return $summary['zipcodes']->map(function (Zipcode $zipcode) use ($summary) {
+                    $subscription = $summary['subscription'];
                     $interval = $summary['interval'];
                     $price = $interval === Zipcode::BILLING_YEARLY
                         ? $zipcode->yearly_price
@@ -125,19 +131,143 @@ class SubscriptionController extends Controller
 
                     return [
                         'id' => $zipcode->id,
+                        'subscription_id' => $subscription->id,
                         'code' => $zipcode->code,
                         'city' => $zipcode->city ?? 'N/A',
                         'state' => $zipcode->state ?? 'N/A',
                         'billing_interval' => $interval,
-                        'subscription_start' => $summary['subscription']->formattedStartDate(),
-                        'subscription_end' => $summary['subscription']->formattedEndDate(),
+                        'subscription_start' => $subscription->formattedStartDate(),
+                        'subscription_end' => $subscription->formattedEndDate(),
                         'price' => $price === null ? null : number_format((float) $price, 2),
                         'price_label' => $interval === Zipcode::BILLING_YEARLY ? '/year' : '/month',
+                        'cancel_at_period_end' => (bool) $subscription->cancel_at_period_end,
+                        'can_cancel' => $this->canCancel($subscription),
+                        'can_reactivate' => $this->canReactivate($subscription),
+                        'upgrade_option' => $this->resolveUpgradeOption($zipcode, $interval, $subscription),
                     ];
                 });
             })->values()->all(),
             'billingHistory' => $billingHistory,
         ]);
+    }
+
+    public function cancel(UserZipcodeSubscription $subscription): JsonResponse
+    {
+        $this->authorizeSubscription($subscription);
+
+        try {
+            $this->stripeSubscriptions->cancelAtPeriodEnd($subscription);
+        } catch (\RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
+
+        $subscription->refresh();
+
+        return response()->json([
+            'message' => 'Your subscription has been scheduled to cancel. You keep full access until '.$subscription->formattedEndDate().'.',
+            'subscription_end' => $subscription->formattedEndDate(),
+            'cancel_at_period_end' => true,
+        ]);
+    }
+
+    public function reactivate(UserZipcodeSubscription $subscription): JsonResponse
+    {
+        $this->authorizeSubscription($subscription);
+
+        try {
+            $this->stripeSubscriptions->reactivateSubscription($subscription);
+        } catch (\RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
+
+        $subscription->refresh();
+
+        return response()->json([
+            'message' => 'Your subscription has been reactivated and will continue renewing.',
+            'cancel_at_period_end' => false,
+        ]);
+    }
+
+    public function upgrade(Request $request, UserZipcodeSubscription $subscription): JsonResponse
+    {
+        $this->authorizeSubscription($subscription);
+
+        $validated = $request->validate([
+            'billing_interval' => ['required', 'in:month,year'],
+        ]);
+
+        try {
+            $this->stripeSubscriptions->upgradeBillingInterval(
+                $subscription,
+                $validated['billing_interval'],
+            );
+        } catch (\RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        }
+
+        $subscription->refresh();
+
+        $intervalLabel = $subscription->billing_interval === Zipcode::BILLING_YEARLY
+            ? 'yearly'
+            : 'monthly';
+
+        return response()->json([
+            'message' => "Your subscription has been upgraded to {$intervalLabel} billing.",
+            'billing_interval' => $subscription->billing_interval,
+        ]);
+    }
+
+    protected function authorizeSubscription(UserZipcodeSubscription $subscription): void
+    {
+        abort_unless(
+            $subscription->user_id === Auth::id(),
+            403,
+            'You do not have access to this subscription.',
+        );
+    }
+
+    protected function canCancel(UserZipcodeSubscription $subscription): bool
+    {
+        return $subscription->status === 'active'
+            && filled($subscription->stripe_subscription_id)
+            && ! $subscription->cancel_at_period_end;
+    }
+
+    protected function canReactivate(UserZipcodeSubscription $subscription): bool
+    {
+        return $subscription->status === 'active'
+            && filled($subscription->stripe_subscription_id)
+            && $subscription->cancel_at_period_end;
+    }
+
+    protected function resolveUpgradeOption(Zipcode $zipcode, string $currentInterval, UserZipcodeSubscription $subscription): ?array
+    {
+        if ($subscription->status !== 'active' || $subscription->cancel_at_period_end) {
+            return null;
+        }
+
+        if (! filled($subscription->stripe_subscription_id)) {
+            return null;
+        }
+
+        $targetInterval = $currentInterval === Zipcode::BILLING_YEARLY
+            ? Zipcode::BILLING_MONTHLY
+            : Zipcode::BILLING_YEARLY;
+
+        if (! $zipcode->hasStripePriceForInterval($targetInterval)) {
+            return null;
+        }
+
+        $plan = $zipcode->resolveBillingPlan($targetInterval);
+        $isUpgrade = $targetInterval === Zipcode::BILLING_YEARLY;
+
+        return [
+            'interval' => $targetInterval,
+            'label' => $plan['label'],
+            'price' => number_format($plan['amount'], 2),
+            'price_label' => $targetInterval === Zipcode::BILLING_YEARLY ? '/year' : '/month',
+            'action_label' => $isUpgrade ? 'Upgrade to Yearly' : 'Switch to Monthly',
+        ];
     }
 
     protected function resolveNextBillingDate($subscriptions): string

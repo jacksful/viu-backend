@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -28,4 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
             // Default redirect to user portal login
             return redirect()->guest(route('user.login'));
         });
-    })->create();
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('subscriptions:send-renewal-reminders')->dailyAt('09:00');
+        $schedule->command('subscriptions:send-final-notices')->dailyAt('09:00');
+        $schedule->command('subscriptions:send-payment-reminders')->dailyAt('09:00');
+        $schedule->command('subscriptions:send-card-expiring-notices')->dailyAt('09:00');
+        $schedule->command('subscriptions:send-zip-available-inquiry-notices')->dailyAt('09:00');
+        $schedule->command('subscriptions:send-intake-reminders')->dailyAt('09:00');
+    })
+    ->create();

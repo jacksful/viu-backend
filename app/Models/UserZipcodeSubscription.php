@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\SendSubscriptionExpiredEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -19,12 +20,27 @@ class UserZipcodeSubscription extends Model
         'stripe_subscription_id',
         'stripe_customer_id',
         'billing_interval',
+        'cancel_at_period_end',
+        'renewal_reminder_sent_for_end_date',
+        'final_notice_sent_for_end_date',
+        'payment_reminder_sent_for_end_date',
+        'card_expiring_notice_sent_for_exp',
+        'cancellation_confirmation_sent_at',
+        'expiration_email_sent_at',
+        'intake_reminder_sent_at',
     ];
 
     protected $casts = [
         'zipcode_ids' => 'array',
         'start_date' => 'date',
         'end_date' => 'date',
+        'cancel_at_period_end' => 'boolean',
+        'renewal_reminder_sent_for_end_date' => 'date',
+        'final_notice_sent_for_end_date' => 'date',
+        'payment_reminder_sent_for_end_date' => 'date',
+        'cancellation_confirmation_sent_at' => 'datetime',
+        'expiration_email_sent_at' => 'datetime',
+        'intake_reminder_sent_at' => 'datetime',
     ];
 
     /**
@@ -55,6 +71,13 @@ class UserZipcodeSubscription extends Model
             // Send notification when status changes to active
             if ($subscription->wasChanged('status') && $subscription->status === 'active') {
                 $subscription->sendSubscriptionActivatedNotification();
+            }
+
+            if (
+                $subscription->wasChanged('status')
+                && in_array($subscription->status, ['canceled', 'expired'], true)
+            ) {
+                SendSubscriptionExpiredEmail::dispatch($subscription->id);
             }
         });
     }

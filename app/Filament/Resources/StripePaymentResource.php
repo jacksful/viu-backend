@@ -26,7 +26,7 @@ class StripePaymentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'Report';
     }
 
     public static function form(Schema $schema): Schema
