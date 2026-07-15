@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use App\Models\UserZipcodeSubscription;
 use App\Models\Zipcode;
+use App\Services\ZipcodeValidationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -87,7 +88,7 @@ class LeadController extends Controller
     /**
      * Check if a zipcode is available.
      */
-    public function checkAvailability(Request $request)
+    public function checkAvailability(Request $request, ZipcodeValidationService $zipcodeValidation)
     {
         $request->validate([
             'zipcode' => ['required', 'string', 'max:10'],
@@ -95,15 +96,32 @@ class LeadController extends Controller
 
         $zipcodeCode = trim($request->zipcode);
 
+        if (! $zipcodeValidation->isValidUsZipcode($zipcodeCode)) {
+            return response()->json([
+                'available' => false,
+                'is_in_coverage_area' => false,
+                'is_purchasable' => false,
+                'is_valid' => false,
+                'title' => 'Invalid ZIP code',
+                'message' => 'Please enter a valid US ZIP code.',
+            ], 200);
+        }
+
+        
+
         $zipcode = Zipcode::where('code', '=', $zipcodeCode, 'and')
             ->where('is_active', '=', true, 'and')
             ->first();
+
+        
 
         if (!$zipcode) {
             return response()->json([
                 'available' => false,
                 'is_in_coverage_area' => false,
                 'is_purchasable' => false,
+                'is_valid' => true,
+                'title' => 'Outside coverage area',
                 'message' => 'ZIP code not available in our coverage area.',
             ], 200);
         }
@@ -117,16 +135,31 @@ class LeadController extends Controller
                 'available' => false,
                 'is_in_coverage_area' => true,
                 'is_purchasable' => true,
+                'is_valid' => true,
+                'title' => 'ZIP unavailable',
                 'message' => "ZIP code " . $zipcodeCode . " is currently owned by another agent. Try a different ZIP code Or fill out the form below to be notified when it becomes available.",
+            ], 200);
+        }
+
+        if (! $zipcode->hasDatasets()) {
+            return response()->json([
+                'available' => false,
+                'is_in_coverage_area' => true,
+                'is_purchasable' => false,
+                'is_valid' => true,
+                'title' => 'Not ready for purchase',
+                'message' => 'Property data is not available yet for this ZIP code. Fill out the form below and we will notify you when it is ready to purchase.',
             ], 200);
         }
 
         if (! $zipcode->hasPurchasablePlans()) {
             return response()->json([
-                'available' => true,
+                'available' => false,
                 'is_in_coverage_area' => true,
                 'is_purchasable' => false,
-                'message' => 'ZIP code is ready for purchase!',
+                'is_valid' => true,
+                'title' => 'Not ready for purchase',
+                'message' => 'Subscription pricing is not configured yet for this ZIP code. Fill out the form below and we will follow up.',
             ], 200);
         }
 
@@ -139,6 +172,9 @@ class LeadController extends Controller
 
         return response()->json([
             'available' => true,
+            'is_valid' => true,
+            'is_in_coverage_area' => true,
+            'is_purchasable' => true,
             'message' => 'ZIP code is available!',
             'zipcode' => [
                 'id' => $zipcode->id,

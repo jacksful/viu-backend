@@ -137,6 +137,16 @@ class Zipcode extends Model
         return $this->purchasableBillingPlans() !== [];
     }
 
+    public function hasDatasets(): bool
+    {
+        return $this->datasets()->exists();
+    }
+
+    public function isReadyToPurchase(): bool
+    {
+        return $this->hasDatasets() && $this->hasPurchasablePlans();
+    }
+
     public function assertStripePriceForInterval(string $interval): string
     {
         $stripePriceId = $this->stripePriceIdForInterval($interval);

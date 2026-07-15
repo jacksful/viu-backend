@@ -52,6 +52,12 @@ class StripeCheckoutController extends Controller
             ], 422);
         }
 
+        if (! $zipcode->hasDatasets()) {
+            return response()->json([
+                'message' => 'This ZIP code is not ready for purchase because property data is not available yet.',
+            ], 422);
+        }
+
         if (! $zipcode->hasStripePriceForInterval($validated['billing_interval'])) {
             return response()->json([
                 'message' => 'The selected billing plan is not available for online checkout yet.',

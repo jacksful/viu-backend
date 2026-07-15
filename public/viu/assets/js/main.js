@@ -24,16 +24,126 @@
     return r.json().then(function (d) {
       if (!r.ok) {
         var msg = d.message || d.error || 'Request failed.';
+        var err = new Error(msg);
+        err.status = r.status;
+        err.payload = d;
         if (d.errors) {
           var first = Object.keys(d.errors)[0];
           if (first && d.errors[first] && d.errors[first][0]) {
             msg = d.errors[first][0];
+            err.message = msg;
           }
         }
-        throw new Error(msg);
+        throw err;
       }
       return d;
     });
+  }
+
+  /* ---------- Form validation ------------------------------------------- */
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function usPhoneDigits(phone) {
+    var digits = String(phone || '').replace(/\D/g, '');
+    if (digits.length === 11 && digits.charAt(0) === '1') digits = digits.slice(1);
+    return digits;
+  }
+
+  function isValidEmail(value) {
+    return EMAIL_RE.test(String(value || '').trim());
+  }
+
+  function isValidUsPhone(value) {
+    var digits = usPhoneDigits(value);
+    return !value || !String(value).trim() || digits.length === 10;
+  }
+
+  function formatUsPhone(value) {
+    var digits = usPhoneDigits(value);
+    if (digits.length !== 10) return String(value || '').trim();
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+  }
+
+  function getFieldErrorEl(input) {
+    if (!input) return null;
+    var field = input.closest('.viu-field');
+    return field ? field.querySelector('[data-viu-field-error]') : null;
+  }
+
+  function setFieldError(input, msg) {
+    var errEl = getFieldErrorEl(input);
+    if (errEl) {
+      errEl.textContent = msg || '';
+      errEl.hidden = !msg;
+    }
+    if (input) {
+      input.classList.toggle('is-invalid', !!msg);
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    }
+  }
+
+  function clearFormFieldErrors(form) {
+    if (!form) return;
+    $$('.viu-input, .viu-modal__zip, .viu-textarea', form).forEach(function (input) {
+      setFieldError(input, '');
+    });
+  }
+
+  function focusFirstInvalid(form) {
+    var first = form ? form.querySelector('.is-invalid') : null;
+    if (first) first.focus();
+  }
+
+  function validateContactFields(form) {
+    clearFormFieldErrors(form);
+    var valid = true;
+    var name = $('input[name="name"]', form);
+    var email = $('input[name="email"]', form);
+    var phone = $('input[name="phone"]', form);
+
+    if (!name || !name.value.trim()) {
+      setFieldError(name, 'Full name is required.');
+      valid = false;
+    }
+    if (!email || !email.value.trim()) {
+      setFieldError(email, 'Email address is required.');
+      valid = false;
+    } else if (!isValidEmail(email.value)) {
+      setFieldError(email, 'Please enter a valid email address.');
+      valid = false;
+    }
+    if (phone && phone.value.trim() && !isValidUsPhone(phone.value)) {
+      setFieldError(phone, 'Please enter a valid US phone number (e.g. (555) 555-5555).');
+      valid = false;
+    }
+
+    if (!valid) focusFirstInvalid(form);
+    return valid;
+  }
+
+  function bindFieldValidationClear(form) {
+    if (!form) return;
+    $$('.viu-input, .viu-textarea', form).forEach(function (input) {
+      input.addEventListener('input', function () {
+        if (input.classList.contains('is-invalid')) setFieldError(input, '');
+      });
+      if (input.type === 'tel') {
+        input.addEventListener('blur', function () {
+          if (input.value.trim()) input.value = formatUsPhone(input.value);
+        });
+      }
+    });
+  }
+
+  function applyServerFieldErrors(form, errors) {
+    if (!form || !errors) return;
+    Object.keys(errors).forEach(function (key) {
+      var messages = errors[key];
+      if (!messages || !messages.length) return;
+      var input = form.querySelector('[name="' + key + '"]');
+      if (input) setFieldError(input, messages[0]);
+    });
+    focusFirstInvalid(form);
   }
 
   /* ---------- Navbar ---------------------------------------------------- */
@@ -319,7 +429,9 @@
     var contactError = $('[data-viu-modal-contact-error]', modal);
     var contactBtn   = contactForm ? $('button[type="submit"]', contactForm) : null;
     var contactMsgEl = $('[data-viu-modal-contact-message]', modal);
+    var contactTitleEl = $('[data-viu-modal-contact-title]', modal);
     var unavailableMsgEl = $('[data-viu-modal-unavailable-message]', modal);
+    var unavailableTitleEl = $('[data-viu-modal-unavailable-title]', modal);
     var contactZipInput = contactForm ? $('input[name="zipCode"]', contactForm) : null;
     var currentZipcode = null;
     var currentZip = '';
@@ -333,8 +445,13 @@
 
     function check() {
       var zip = (zipInput && zipInput.value || '').trim();
-      if (!/^\d{5}$/.test(zip)) { showErr(errorEl, 'Please enter a valid 5-digit ZIP code.'); return; }
+      setFieldError(zipInput, '');
       showErr(errorEl, '');
+      if (!/^\d{5}$/.test(zip)) {
+        setFieldError(zipInput, 'Please enter a valid 5-digit ZIP code.');
+        if (zipInput) zipInput.focus();
+        return;
+      }
       var endpoint = config.zipCheckUrl || modal.getAttribute('data-zip-endpoint');
       withLoading(checkBtn, function () {
         if (!endpoint) return Promise.resolve({ available: true });
@@ -354,6 +471,9 @@
           setStep('available');
         } else if (data && data.is_in_coverage_area) {
           currentZipcode = null;
+          if (contactTitleEl) {
+            contactTitleEl.textContent = (data && data.title) ? data.title : 'ZIP unavailable';
+          }
           if (contactMsgEl) {
             contactMsgEl.textContent = data.message || ('ZIP code ' + zip + ' is currently unavailable. Contact us and we will follow up.');
           }
@@ -361,9 +481,15 @@
           if (contactForm) contactForm.reset();
           if (contactZipInput) contactZipInput.value = zip;
           showErr(contactError, '');
+          clearFormFieldErrors(contactForm);
           setStep('contact');
         } else {
           currentZipcode = null;
+          if (unavailableTitleEl) {
+            unavailableTitleEl.textContent = (data && data.title)
+              ? data.title
+              : (data && data.is_valid === false ? 'Invalid ZIP code' : 'Outside coverage area');
+          }
           if (unavailableMsgEl) {
             unavailableMsgEl.textContent = (data && data.message)
               ? data.message
@@ -385,6 +511,9 @@
       document.body.classList.add('viu-modal-open');
       setStep('zip-search');
       showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
+      setFieldError(zipInput, '');
+      clearFormFieldErrors(leadForm);
+      clearFormFieldErrors(contactForm);
       if (zipInput && typeof prefill === 'string') zipInput.value = prefill.replace(/\D/g, '').slice(0, 5);
       if (zipInput) setTimeout(function () { zipInput.focus(); }, 50);
       if (zipInput && /^\d{5}$/.test(zipInput.value)) check();
@@ -403,6 +532,9 @@
         if (leadForm) leadForm.reset();
         if (contactForm) contactForm.reset();
         showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
+        setFieldError(zipInput, '');
+        clearFormFieldErrors(leadForm);
+        clearFormFieldErrors(contactForm);
         resetTimer = null;
       }, 250);
     };
@@ -419,14 +551,23 @@
     });
 
     if (checkBtn) checkBtn.addEventListener('click', check);
-    if (zipInput) zipInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+    if (zipInput) {
+      zipInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+      zipInput.addEventListener('input', function () {
+        if (zipInput.classList.contains('is-invalid')) setFieldError(zipInput, '');
+      });
+    }
+
+    bindFieldValidationClear(leadForm);
+    bindFieldValidationClear(contactForm);
 
     if (leadForm) leadForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (!validateContactFields(leadForm)) { showErr(leadError, ''); return; }
       var fd = new FormData(leadForm);
       var data = {};
       fd.forEach(function (v, k) { data[k] = v; });
-      if (!data.name || !data.email) { showErr(leadError, 'Name and email are required.'); return; }
+      if (data.phone) data.phone = formatUsPhone(data.phone);
       if (!currentZipcode || !currentZipcode.id) { showErr(leadError, 'Please check ZIP availability first.'); return; }
       showErr(leadError, '');
       var checkoutEndpoint = config.stripeCheckoutUrl || config.leadStoreUrl || leadForm.getAttribute('data-endpoint');
@@ -467,15 +608,23 @@
       }).then(function (response) {
         if (response && response.checkout_url) return;
         setStep('success');
-      }).catch(function (err) { showErr(leadError, err.message || 'Network error. Please try again.'); });
+      }).catch(function (err) {
+        if (err.payload && err.payload.errors) {
+          applyServerFieldErrors(leadForm, err.payload.errors);
+          showErr(leadError, '');
+        } else {
+          showErr(leadError, err.message || 'Network error. Please try again.');
+        }
+      });
     });
 
     if (contactForm) contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
+      if (!validateContactFields(contactForm)) { showErr(contactError, ''); return; }
       var fd = new FormData(contactForm);
       var data = {};
       fd.forEach(function (v, k) { data[k] = v; });
-      if (!data.name || !data.email) { showErr(contactError, 'Name and email are required.'); return; }
+      if (data.phone) data.phone = formatUsPhone(data.phone);
       showErr(contactError, '');
       var endpoint = config.contactStoreUrl || contactForm.getAttribute('data-endpoint');
       withLoading(contactBtn, function () {
@@ -494,7 +643,14 @@
           body: body,
         }).then(parseJsonResponse);
       }).then(function () { setStep('contact-success'); })
-        .catch(function (err) { showErr(contactError, err.message || 'Network error. Please try again.'); });
+        .catch(function (err) {
+          if (err.payload && err.payload.errors) {
+            applyServerFieldErrors(contactForm, err.payload.errors);
+            showErr(contactError, '');
+          } else {
+            showErr(contactError, err.message || 'Network error. Please try again.');
+          }
+        });
     });
 
     $$('[data-viu-modal-close]', modal).forEach(function (el) { el.addEventListener('click', close); });
@@ -504,6 +660,7 @@
       currentZip = '';
       selectedBillingInterval = 'month';
       showErr(contactError, '');
+      clearFormFieldErrors(contactForm);
       if (zipInput) { zipInput.value = ''; zipInput.focus(); }
     };
     var retry = $('[data-viu-modal-retry]', modal);

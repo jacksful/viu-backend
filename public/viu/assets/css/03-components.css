@@ -152,11 +152,23 @@
 }
 .viu-input::placeholder { color: var(--viu-color-text-light); }
 .viu-input:focus { outline: none; border-color: var(--viu-color-primary); }
+.viu-input.is-invalid { border-color: var(--viu-color-error); }
+.viu-input.is-invalid:focus { border-color: var(--viu-color-error); }
+.viu-modal__zip.is-invalid { border-color: var(--viu-color-error); }
 .viu-textarea { resize: none; }
+
+.viu-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.viu-field .viu-input,
+.viu-field .viu-modal__zip { margin-bottom: 0; }
 
 .viu-field-error {
   font-size: var(--viu-fs-sm);
-  color: var(--viu-color-accent);
+  color: var(--viu-color-error);
+  line-height: 1.3;
 }
 
 .viu-form-result {
@@ -426,7 +438,7 @@
 .viu-modal__lead { padding: 1.25rem; display: flex; flex-direction: column; }
 .viu-modal__lead h3 { font-size: 1.125rem; font-weight: var(--viu-fw-bold); color: var(--viu-color-primary);  margin-bottom: 0.25rem; }
 .viu-modal__lead p.viu-modal__lead-sub { color: var(--viu-color-text); font-size: var(--viu-fs-sm); margin-bottom: 1.25rem; }
-.viu-modal__lead .viu-input { margin-bottom: 0.75rem; }
+.viu-modal__lead .viu-field { margin-bottom: 0.75rem; }
 .viu-modal__fine { color: var(--viu-color-text-light); font-size: var(--viu-fs-xs); text-align: center; margin-top: 1rem; }
 
 .viu-modal__msg { color: var(--viu-color-text); font-size: var(--viu-fs-base); margin-bottom: 0.5rem; }

@@ -14,8 +14,11 @@
                 <p class="viu-modal__sub">Enter your desired ZIP code to check territory availability.</p>
             </div>
             <div class="viu-modal__body">
-                <label class="u-visually-hidden" for="modal-zip">ZIP code</label>
-                <input class="viu-modal__zip" id="modal-zip" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code" data-viu-zip-input data-viu-modal-zip />
+                <div class="viu-field">
+                    <label class="u-visually-hidden" for="modal-zip">ZIP code</label>
+                    <input class="viu-modal__zip" id="modal-zip" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code" data-viu-zip-input data-viu-modal-zip aria-describedby="modal-zip-error" />
+                    <p class="viu-field-error" id="modal-zip-error" data-viu-field-error hidden role="alert"></p>
+                </div>
                 <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-check>Check availability</button>
                 <p class="viu-modal__error" data-viu-modal-error hidden></p>
             </div>
@@ -31,13 +34,25 @@
                 <span class="viu-modal__per">Per ZIP code</span>
             </div>
             <div class="viu-modal__plans" data-viu-modal-plans hidden></div>
-            <form class="viu-modal__lead" data-viu-modal-lead>
+            <form class="viu-modal__lead" data-viu-modal-lead novalidate>
                 <h3>Secure your territory</h3>
                 <p class="viu-modal__lead-sub">Complete checkout to activate your exclusive ZIP territory subscription.</p>
-                <input class="viu-input" name="name" type="text" placeholder="Full name *" aria-label="Full name" required />
-                <input class="viu-input" name="email" type="email" placeholder="Email address *" aria-label="Email address" required />
-                <input class="viu-input" name="phone" type="tel" placeholder="Phone number" aria-label="Phone number" />
-                <input class="viu-input" name="company" type="text" placeholder="Company / brokerage" aria-label="Company or brokerage" />
+                <div class="viu-field">
+                    <input class="viu-input" name="name" type="text" placeholder="Full name *" aria-label="Full name" autocomplete="name" required />
+                    <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                </div>
+                <div class="viu-field">
+                    <input class="viu-input" name="email" type="email" placeholder="Email address *" aria-label="Email address" autocomplete="email" required />
+                    <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                </div>
+                <div class="viu-field">
+                    <input class="viu-input" name="phone" type="tel" placeholder="Phone number (US)" aria-label="Phone number" autocomplete="tel" inputmode="tel" />
+                    <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                </div>
+                <div class="viu-field">
+                    <input class="viu-input" name="company" type="text" placeholder="Company / brokerage" aria-label="Company or brokerage" autocomplete="organization" />
+                    <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                </div>
                 <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Subscribe &amp; claim territory</button>
                 <p class="viu-modal__error" data-viu-modal-lead-error hidden></p>
                 <p class="viu-modal__fine">Secure Stripe checkout. Locked-in pricing while your subscription is active. Cancel anytime.</p>
@@ -59,22 +74,37 @@
                 <span class="viu-modal__icon viu-modal__icon--warn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
                 </span>
-                <h3 class="viu-modal__title">ZIP unavailable</h3>
+                <h3 class="viu-modal__title" data-viu-modal-contact-title>ZIP unavailable</h3>
                 <p class="viu-modal__sub" data-viu-modal-contact-message></p>
             </div>
-            <form class="viu-contact" data-viu-modal-contact>
+            <form class="viu-contact" data-viu-modal-contact novalidate>
                 <div class="viu-contact__grid">
-                    <label class="u-visually-hidden" for="modal-contact-name">Full name</label>
-                    <input class="viu-input" id="modal-contact-name" name="name" type="text" placeholder="Full name *" required />
-                    <label class="u-visually-hidden" for="modal-contact-email">Email address</label>
-                    <input class="viu-input" id="modal-contact-email" name="email" type="email" placeholder="Email address *" required />
-                    <label class="u-visually-hidden" for="modal-contact-phone">Phone number</label>
-                    <input class="viu-input" id="modal-contact-phone" name="phone" type="tel" placeholder="Phone number" />
-                    <label class="u-visually-hidden" for="modal-contact-zip">ZIP code of interest</label>
-                    <input class="viu-input" id="modal-contact-zip" name="zipCode" type="text" inputmode="numeric" maxlength="5" placeholder="ZIP code of interest" data-viu-zip-input readonly />
+                    <div class="viu-field">
+                        <label class="u-visually-hidden" for="modal-contact-name">Full name</label>
+                        <input class="viu-input" id="modal-contact-name" name="name" type="text" placeholder="Full name *" autocomplete="name" required />
+                        <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                    </div>
+                    <div class="viu-field">
+                        <label class="u-visually-hidden" for="modal-contact-email">Email address</label>
+                        <input class="viu-input" id="modal-contact-email" name="email" type="email" placeholder="Email address *" autocomplete="email" required />
+                        <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                    </div>
+                    <div class="viu-field">
+                        <label class="u-visually-hidden" for="modal-contact-phone">Phone number</label>
+                        <input class="viu-input" id="modal-contact-phone" name="phone" type="tel" placeholder="Phone number (US)" autocomplete="tel" inputmode="tel" />
+                        <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                    </div>
+                    <div class="viu-field">
+                        <label class="u-visually-hidden" for="modal-contact-zip">ZIP code of interest</label>
+                        <input class="viu-input" id="modal-contact-zip" name="zipCode" type="text" inputmode="numeric" maxlength="5" placeholder="ZIP code of interest" data-viu-zip-input readonly />
+                        <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                    </div>
                 </div>
-                <label class="u-visually-hidden" for="modal-contact-message">Message</label>
-                <textarea class="viu-input viu-textarea" id="modal-contact-message" name="message" rows="3" placeholder="Tell us about your market (optional)"></textarea>
+                <div class="viu-field">
+                    <label class="u-visually-hidden" for="modal-contact-message">Message</label>
+                    <textarea class="viu-input viu-textarea" id="modal-contact-message" name="message" rows="3" placeholder="Tell us about your market (optional)"></textarea>
+                    <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
+                </div>
                 <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Contact a specialist</button>
                 <p class="viu-modal__error" data-viu-modal-contact-error hidden></p>
             </form>
@@ -94,7 +124,7 @@
             <span class="viu-modal__icon viu-modal__icon--warn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
             </span>
-            <h3 class="viu-modal__title">Outside coverage area</h3>
+            <h3 class="viu-modal__title" data-viu-modal-unavailable-title>Outside coverage area</h3>
             <p class="viu-modal__msg viu-modal__msg--sm" data-viu-modal-unavailable-message></p>
             <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-retry>Try another ZIP</button>
         </div>
