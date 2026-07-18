@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Models\UserZipcodeSubscription;
+use App\Models\Waitlist;
 use App\Models\Zipcode;
 use App\Services\ZipcodeValidationService;
 use Illuminate\Http\Request;
@@ -25,14 +26,12 @@ class LeadController extends Controller
             'initial_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        // Create the lead
         $lead = Lead::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'initial_notes' => $validated['initial_notes'] ?? null,
             'lead_status' => 'new',
-            'payment_status' => 'unpaid',
         ]);
 
         // Attach zipcodes
@@ -70,7 +69,6 @@ class LeadController extends Controller
             'phone' => $validated['phone'] ?? null,
             'initial_notes' => $validated['initial_notes'] ?? null,
             'lead_status' => 'new',
-            'payment_status' => 'unpaid',
         ]);
 
         $lead->zipcodes()->attach($validated['zipcodes']);
@@ -130,7 +128,9 @@ class LeadController extends Controller
             ->forZipcode($zipcode->id)
             ->exists();
 
-        if ($isSubscribed) {
+        $isLocked = Waitlist::isZipcodeLocked($zipcode->code);
+
+        if ($isSubscribed || $isLocked) {
             return response()->json([
                 'available' => false,
                 'is_in_coverage_area' => true,

@@ -21,9 +21,9 @@ class SiteSettingsPage extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationLabel = 'Site Settings';
+    protected static ?string $navigationLabel = 'General';
 
-    protected static ?string $title = 'Site Settings';
+    protected static ?string $title = 'General Settings';
 
     protected static ?int $navigationSort = 1;
 

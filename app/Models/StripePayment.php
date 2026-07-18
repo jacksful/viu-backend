@@ -9,7 +9,6 @@ class StripePayment extends Model
 {
     protected $fillable = [
         'user_id',
-        'lead_id',
         'user_zipcode_subscription_id',
         'zipcode_id',
         'stripe_customer_id',
@@ -39,11 +38,6 @@ class StripePayment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function lead(): BelongsTo
-    {
-        return $this->belongsTo(Lead::class);
-    }
-
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(UserZipcodeSubscription::class, 'user_zipcode_subscription_id');
@@ -52,6 +46,11 @@ class StripePayment extends Model
     public function zipcode(): BelongsTo
     {
         return $this->belongsTo(Zipcode::class);
+    }
+
+    public function checkoutHold(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CheckoutHold::class);
     }
 
     public function formattedAmount(): string

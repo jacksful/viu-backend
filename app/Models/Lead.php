@@ -14,9 +14,6 @@ class Lead extends Model
         'phone',
         'initial_notes',
         'lead_status',
-        'payment_status',
-        'stripe_checkout_session_id',
-        'stripe_subscription_id',
         'last_contact_date',
         'next_follow_up_date',
         'internal_comments',
@@ -48,12 +45,11 @@ class Lead extends Model
     }
 
     /**
-     * Check if lead is ready to convert (meets all requirements).
+     * Check if waitlist lead is ready to convert to a client.
      */
     public function isReadyToConvert(): bool
     {
-        return $this->lead_status === 'interested' 
-            && $this->payment_status === 'paid'
+        return $this->lead_status === 'interested'
             && $this->zipcodes()->count() > 0
             && is_null($this->converted_to_user_id);
     }

@@ -23,7 +23,7 @@ class CmsAboutMissionSectionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'about mission';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?string $navigationParentItem = 'About';
 

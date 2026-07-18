@@ -3,15 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SendZipAvailableInquiryEmail;
-use App\Models\Contact;
 use App\Models\UserZipcodeSubscription;
+use App\Models\Waitlist;
 use Illuminate\Console\Command;
 
 class SendZipAvailableInquiryNoticesCommand extends Command
 {
-    protected $signature = 'subscriptions:send-zip-available-inquiry-notices {--days=3 : Days after subscription end to notify interested contacts}';
+    protected $signature = 'subscriptions:send-zip-available-inquiry-notices {--days=3 : Days after subscription end to notify waitlisted users}';
 
-    protected $description = 'Notify waitlisted contacts when a ZIP becomes available after a subscription expires';
+    protected $description = 'Notify waitlisted users when a ZIP becomes available after a subscription expires';
 
     public function handle(): int
     {
@@ -44,8 +44,8 @@ class SendZipAvailableInquiryNoticesCommand extends Command
                     continue;
                 }
 
-                $contacts = Contact::query()
-                    ->where('zip_of_interest', $zipcode->code)
+                $waitlistEntries = Waitlist::query()
+                    ->where('zip_code', $zipcode->code)
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
                     ->where(function ($query) use ($subscription) {
@@ -55,9 +55,9 @@ class SendZipAvailableInquiryNoticesCommand extends Command
                     ->orderBy('id')
                     ->get();
 
-                foreach ($contacts as $contact) {
+                foreach ($waitlistEntries as $waitlist) {
                     SendZipAvailableInquiryEmail::dispatch(
-                        $contact->id,
+                        $waitlist->id,
                         $subscription->id,
                         $zipcode->id,
                     );
@@ -68,7 +68,7 @@ class SendZipAvailableInquiryNoticesCommand extends Command
         }
 
         if ($queued === 0) {
-            $this->info('No interested contacts to notify for recently expired subscriptions.');
+            $this->info('No waitlist entries to notify for recently expired subscriptions.');
 
             return self::SUCCESS;
         }

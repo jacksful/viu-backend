@@ -30,9 +30,9 @@ class PageResource extends Resource
 
     protected static ?string $pluralModelLabel = 'pages';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
@@ -284,7 +284,8 @@ class PageResource extends Resource
                     )->all()),
             ])
             ->actions([
-                Actions\Action::make('preview')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('preview')
                     ->label('Preview')
                     ->icon('heroicon-o-eye')
                     ->url(fn (Page $record): string => URL::temporarySignedRoute(
@@ -296,11 +297,18 @@ class PageResource extends Resource
 
                 Actions\EditAction::make(),
 
-                Actions\DeleteAction::make(),
+                Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete page')
+                    ->modalDescription('Are you sure you want to delete this page? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Delete selected pages')
+                        ->modalDescription('Are you sure you want to delete the selected pages? This action cannot be undone.'),
                 ]),
             ]);
     }

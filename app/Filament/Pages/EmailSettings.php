@@ -19,7 +19,7 @@ class EmailSettings extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationLabel = 'Email Settings';
+    protected static ?string $navigationLabel = 'Email';
 
     protected static ?string $title = 'Email Settings';
 

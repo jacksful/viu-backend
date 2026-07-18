@@ -24,7 +24,7 @@ class CmsPricingSectionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pricing Section';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?string $navigationParentItem = 'Home Page';
 

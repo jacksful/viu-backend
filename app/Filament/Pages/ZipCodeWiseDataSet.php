@@ -16,7 +16,7 @@ class ZipCodeWiseDataSet extends Page
 {
     protected string $view = 'filament.pages.zip-code-wise-data-set';
     protected static ?string $navigationLabel = 'Zip Code Wise Data Set';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     public ?string $search = '';
@@ -32,7 +32,7 @@ class ZipCodeWiseDataSet extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Data Management';
+        return 'Market';
     }
 
     public static function canAccess(): bool

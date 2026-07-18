@@ -13,6 +13,8 @@ class ManageUserZipcodeSubscriptions extends ManageRecords
 {
     protected static string $resource = UserZipcodeSubscriptionResource::class;
 
+    protected static ?string $title = 'Clients';
+
     protected function getHeaderActions(): array
     {
         return [

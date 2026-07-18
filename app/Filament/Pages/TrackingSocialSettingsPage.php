@@ -25,9 +25,9 @@ class TrackingSocialSettingsPage extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $navigationLabel = 'Tracking & Social Settings';
+    protected static ?string $navigationLabel = 'Tracking & SEO';
 
-    protected static ?string $title = 'Tracking & Social Settings';
+    protected static ?string $title = 'Tracking & SEO Settings';
 
     protected static ?int $navigationSort = 4;
 

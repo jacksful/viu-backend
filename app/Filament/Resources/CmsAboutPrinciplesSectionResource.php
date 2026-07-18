@@ -23,7 +23,7 @@ class CmsAboutPrinciplesSectionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'about principles';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?string $navigationParentItem = 'About';
 

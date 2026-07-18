@@ -48,9 +48,10 @@
             leadStoreUrl: @json(route('leads.store')),
             stripeCheckoutUrl: @json(route('stripe.checkout')),
             contactStoreUrl: @json(route('contacts.store')),
+            waitlistStoreUrl: @json(route('waitlists.store')),
         };
     </script>
-    <script src="{{ asset('viu/assets/js/main.js') }}"></script>
+    <script src="{{ asset('viu/assets/js/main.js') }}?v={{ filemtime(public_path('viu/assets/js/main.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

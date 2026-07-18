@@ -20,13 +20,13 @@ class ZipcodeResource extends Resource
 {
     protected static ?string $model = Zipcode::class;
 
-    protected static ?string $navigationLabel = 'Zipcodes';
+    protected static ?string $navigationLabel = 'Territories';
 
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Settings';
+        return 'Market';
     }
 
     public static function getNavigationIcon(): ?string
@@ -193,7 +193,8 @@ class ZipcodeResource extends Resource
                     ->falseLabel('Inactive only'),
             ])
             ->actions([
-                Actions\Action::make('createStripePrice')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('createStripePrice')
                     ->label('Create Stripe Price')
                     ->icon('heroicon-o-credit-card')
                     ->color('info')
@@ -230,11 +231,18 @@ class ZipcodeResource extends Resource
                     ->modalHeading('Edit Zipcode')
                     ->modalWidth('5xl')
                     ->modalSubmitActionLabel('Save'),
-                Actions\DeleteAction::make(),
+                Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete zipcode')
+                    ->modalDescription('Are you sure you want to delete this zipcode? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Delete selected zipcodes')
+                        ->modalDescription('Are you sure you want to delete the selected zipcodes? This action cannot be undone.'),
                 ]),
             ])
             ->defaultSort('code');

@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('subscriptions:send-payment-reminders')->dailyAt('09:00');
         $schedule->command('subscriptions:send-card-expiring-notices')->dailyAt('09:00');
         $schedule->command('subscriptions:send-zip-available-inquiry-notices')->dailyAt('09:00');
+        $schedule->command('checkout-holds:expire')->hourly();
         $schedule->command('subscriptions:send-intake-reminders')->dailyAt('09:00');
     })
     ->create();

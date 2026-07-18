@@ -2,18 +2,20 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\AdminDashboard;
+use App\Filament\Pages\ChangePassword;
+use App\Filament\Pages\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\AdminDashboard;
-use App\Filament\Pages\ChangePassword;
-use App\Filament\Pages\EditProfile;
 use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -29,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->maxContentWidth(Width::Full)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->profile(EditProfile::class, isSimple: false)
@@ -45,10 +48,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([])
             ->navigationGroups([
-                NavigationGroup::make('CMS'),
-                NavigationGroup::make('Customer Management'),
-                NavigationGroup::make('Data Management'),
-                NavigationGroup::make('Report'),
+                NavigationGroup::make('Sales'),
+                NavigationGroup::make('Market'),
+                NavigationGroup::make('Website'),
                 NavigationGroup::make('Settings'),
             ])
 
@@ -78,6 +80,10 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn(): string => ChangePassword::getUrl())
                     ->openUrlInNewTab(false)
                     ->sort(10),
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_AFTER,
+                fn (): string => view('filament.hooks.topbar-actions')->render(),
+            );
     }
 }

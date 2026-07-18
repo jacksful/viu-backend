@@ -6,10 +6,11 @@ use App\Jobs\SendCancellationConfirmationEmail;
 use App\Jobs\SendPaymentFailedEmail;
 use App\Jobs\SendSubscriptionActiveEmail;
 use App\Jobs\SendWelcomeIntakeKickoffEmail;
-use App\Models\Lead;
+use App\Models\CheckoutHold;
 use App\Models\StripePayment;
 use App\Models\User;
 use App\Models\UserZipcodeSubscription;
+use App\Models\Waitlist;
 use App\Models\Zipcode;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -26,15 +27,20 @@ class StripeSubscriptionService
     ) {}
 
     /**
-     * @param  array{name: string, email: string, phone?: string|null, company?: string|null, billing_interval?: string|null}  $customer
+     * @param  array{name: string, email: string, phone?: string|null, company?: string|null, billing_interval?: string|null, user_id?: int|null, waitlist_id?: int|null}  $customer
      */
-    public function createCheckoutSession(Zipcode $zipcode, array $customer): CheckoutSession
+    public function createCheckoutSession(Zipcode $zipcode, array $customer, ?CheckoutHold $existingHold = null): CheckoutSession
     {
         if (! $this->stripe->isEnabled()) {
             throw new \RuntimeException('Stripe payments are not enabled.');
         }
 
-        $this->assertZipcodeAvailable($zipcode);
+        $existingHold ??= app(CheckoutHoldService::class)->findActiveHoldForCustomerAndZip(
+            $customer['email'],
+            $zipcode->id,
+        );
+
+        $this->assertZipcodeAvailable($zipcode, $existingHold?->id);
 
         $billingInterval = $customer['billing_interval'] ?? Zipcode::BILLING_MONTHLY;
 
@@ -53,47 +59,9 @@ class StripeSubscriptionService
             'quantity' => 1,
         ];
 
-        $lead = Lead::create([
-            'name' => $customer['name'],
-            'email' => $customer['email'],
-            'phone' => $customer['phone'] ?? null,
-            'initial_notes' => $customer['company'] ?? null,
-            'lead_status' => 'interested',
-            'payment_status' => 'unpaid',
-        ]);
-
-        $lead->zipcodes()->attach($zipcode->id);
-
-        $session = $this->stripe->client()->checkout->sessions->create([
-            'mode' => 'subscription',
-            'customer_email' => $customer['email'],
-            'line_items' => [$lineItem],
-            'metadata' => [
-                'lead_id' => (string) $lead->id,
-                'zipcode_id' => (string) $zipcode->id,
-                'billing_interval' => $plan['interval'],
-                'customer_name' => $customer['name'],
-                'customer_phone' => $customer['phone'] ?? '',
-            ],
-            'subscription_data' => [
-                'metadata' => [
-                    'lead_id' => (string) $lead->id,
-                    'zipcode_id' => (string) $zipcode->id,
-                    'billing_interval' => $plan['interval'],
-                ],
-            ],
-            'success_url' => $settings->resolvedSuccessUrl().'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $settings->resolvedCancelUrl(),
-        ]);
-
-        $lead->update([
-            'stripe_checkout_session_id' => $session->id,
-        ]);
-
-        StripePayment::create([
-            'lead_id' => $lead->id,
+        $payment = StripePayment::create([
+            'user_id' => $customer['user_id'] ?? null,
             'zipcode_id' => $zipcode->id,
-            'stripe_checkout_session_id' => $session->id,
             'amount_cents' => $amountCents,
             'currency' => $settings->currency ?: 'usd',
             'status' => 'checkout_pending',
@@ -105,8 +73,43 @@ class StripeSubscriptionService
                 'billing_interval' => $plan['interval'],
                 'billing_label' => $plan['label'],
                 'stripe_price_id' => $stripePriceId,
+                'customer_phone' => $customer['phone'] ?? '',
+                'customer_company' => $customer['company'] ?? '',
+                'waitlist_id' => isset($customer['waitlist_id']) ? (string) $customer['waitlist_id'] : '',
             ],
         ]);
+
+        $session = $this->stripe->client()->checkout->sessions->create([
+            'mode' => 'subscription',
+            'customer_email' => $customer['email'],
+            'line_items' => [$lineItem],
+            'metadata' => [
+                'stripe_payment_id' => (string) $payment->id,
+                'zipcode_id' => (string) $zipcode->id,
+                'billing_interval' => $plan['interval'],
+                'customer_name' => $customer['name'],
+                'customer_phone' => $customer['phone'] ?? '',
+                'waitlist_id' => isset($customer['waitlist_id']) ? (string) $customer['waitlist_id'] : '',
+            ],
+            'subscription_data' => [
+                'metadata' => [
+                    'stripe_payment_id' => (string) $payment->id,
+                    'zipcode_id' => (string) $zipcode->id,
+                    'billing_interval' => $plan['interval'],
+                    'waitlist_id' => isset($customer['waitlist_id']) ? (string) $customer['waitlist_id'] : '',
+                ],
+            ],
+            'success_url' => $settings->resolvedSuccessUrl().'?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('stripe.checkout.cancel').'?session_id={CHECKOUT_SESSION_ID}',
+        ]);
+
+        $payment->update([
+            'stripe_checkout_session_id' => $session->id,
+        ]);
+
+        if ($existingHold) {
+            app(CheckoutHoldService::class)->transferToPayment($existingHold, $payment);
+        }
 
         return $session;
     }
@@ -118,21 +121,20 @@ class StripeSubscriptionService
         }
 
         $metadata = $session->metadata?->toArray() ?? [];
-        $leadId = $metadata['lead_id'] ?? null;
-        $zipcodeId = $metadata['zipcode_id'] ?? null;
+        $payment = $this->resolveCheckoutPayment($session, $metadata);
 
-        if (! $leadId || ! $zipcodeId) {
+        if (! $payment) {
             return;
         }
 
-        $lead = Lead::query()->find($leadId);
-        $zipcode = Zipcode::query()->find($zipcodeId);
+        $zipcodeId = $payment->zipcode_id ?? ($metadata['zipcode_id'] ?? null);
+        $zipcode = $zipcodeId ? Zipcode::query()->find($zipcodeId) : null;
 
-        if (! $lead || ! $zipcode) {
+        if (! $zipcode) {
             return;
         }
 
-        if ($lead->payment_status === 'paid' && $lead->converted_to_user_id) {
+        if ($payment->status === 'paid' && $payment->user_id) {
             $subscriptionId = is_string($session->subscription) ? $session->subscription : $session->subscription?->id;
             $stripeSubscription = $this->resolveStripeSubscription($session, $subscriptionId);
 
@@ -146,36 +148,42 @@ class StripeSubscriptionService
                 }
             }
 
+            app(CheckoutHoldService::class)->clearHoldOnSuccessfulPayment($payment);
+
             return;
         }
 
         $subscriptionId = is_string($session->subscription) ? $session->subscription : $session->subscription?->id;
         $customerId = is_string($session->customer) ? $session->customer : $session->customer?->id;
         $billingInterval = $metadata['billing_interval']
+            ?? $payment->billing_interval
             ?? ($subscriptionId ? $this->resolveBillingIntervalFromStripe($subscriptionId) : Zipcode::BILLING_MONTHLY);
         $stripeSubscription = $this->resolveStripeSubscription($session, $subscriptionId);
 
+        $customer = [
+            'name' => $payment->customer_name ?? $metadata['customer_name'] ?? 'Customer',
+            'email' => $payment->customer_email ?? $session->customer_email ?? '',
+            'phone' => $payment->metadata['customer_phone'] ?? $metadata['customer_phone'] ?? null,
+        ];
+
         $fulfilledPaymentId = null;
 
-        DB::transaction(function () use ($lead, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription, &$fulfilledPaymentId): void {
-            if (! $this->isZipcodeAvailable($zipcode)) {
+        DB::transaction(function () use ($payment, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription, $customer, &$fulfilledPaymentId): void {
+            $exceptHoldId = app(CheckoutHoldService::class)
+                ->findActiveHoldForCustomerAndZip($customer['email'], $zipcode->id)
+                ?->id;
+
+            if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId)) {
                 if ($subscriptionId) {
                     $this->stripe->client()->subscriptions->cancel($subscriptionId);
                 }
 
-                $lead->update([
-                    'payment_status' => 'unpaid',
-                    'internal_comments' => trim(($lead->internal_comments ?? '')."\nStripe subscription cancelled: ZIP no longer available."),
-                ]);
-
-                StripePayment::query()
-                    ->where('stripe_checkout_session_id', $session->id)
-                    ->update(['status' => 'cancelled_unavailable']);
+                $payment->update(['status' => 'cancelled_unavailable']);
 
                 return;
             }
 
-            $user = $this->resolveCustomerUser($lead, $customerId, $session->customer_email ?? $lead->email);
+            $user = $this->resolveCustomerUser($customer, $customerId, $customer['email']);
             $subscription = $this->activateTerritorySubscription(
                 $user,
                 $zipcode,
@@ -185,35 +193,57 @@ class StripeSubscriptionService
                 $stripeSubscription,
             );
 
-            $lead->update([
-                'payment_status' => 'paid',
-                'lead_status' => 'interested',
-                'stripe_checkout_session_id' => $session->id,
+            $payment->update([
+                'user_id' => $user->id,
+                'user_zipcode_subscription_id' => $subscription->id,
+                'stripe_customer_id' => $customerId,
                 'stripe_subscription_id' => $subscriptionId,
-                'converted_to_user_id' => $user->id,
-                'converted_at' => $lead->converted_at ?? now(),
+                'billing_interval' => $billingInterval,
+                'status' => 'paid',
+                'paid_at' => now(),
             ]);
 
-            StripePayment::query()
-                ->where('stripe_checkout_session_id', $session->id)
-                ->update([
-                    'user_id' => $user->id,
-                    'user_zipcode_subscription_id' => $subscription->id,
-                    'stripe_customer_id' => $customerId,
-                    'stripe_subscription_id' => $subscriptionId,
-                    'billing_interval' => $billingInterval,
-                    'status' => 'paid',
-                    'paid_at' => now(),
-                ]);
-
-            $fulfilledPaymentId = StripePayment::query()
-                ->where('stripe_checkout_session_id', $session->id)
-                ->value('id');
+            $fulfilledPaymentId = $payment->id;
         });
 
         if ($fulfilledPaymentId) {
+            app(CheckoutHoldService::class)->clearHoldOnSuccessfulPayment($payment);
+            $this->releaseWaitlistLock($metadata, $payment);
             SendWelcomeIntakeKickoffEmail::dispatch($fulfilledPaymentId);
         }
+    }
+
+    public function handleCheckoutSessionExpired(CheckoutSession $session): void
+    {
+        $payment = $this->resolveCheckoutPayment($session, $session->metadata?->toArray() ?? []);
+
+        if (! $payment || $payment->status === 'paid') {
+            return;
+        }
+
+        app(CheckoutHoldService::class)->recordAbandonedCheckout($payment);
+    }
+
+    public function handleCheckoutCancelled(CheckoutSession $session): void
+    {
+        $payment = $this->resolveCheckoutPayment($session, $session->metadata?->toArray() ?? []);
+
+        if (! $payment || $payment->status === 'paid') {
+            return;
+        }
+
+        app(CheckoutHoldService::class)->recordAbandonedCheckout($payment);
+    }
+
+    public function handleCheckoutSessionFailed(CheckoutSession $session): void
+    {
+        $payment = $this->resolveCheckoutPayment($session, $session->metadata?->toArray() ?? []);
+
+        if (! $payment || $payment->status === 'paid') {
+            return;
+        }
+
+        app(CheckoutHoldService::class)->recordAbandonedCheckout($payment);
     }
 
     public function syncSubscriptionStatus(Subscription $subscription): void
@@ -254,16 +284,6 @@ class StripeSubscriptionService
             SendCancellationConfirmationEmail::dispatch($localSubscription->id);
         }
 
-        if ($status === 'canceled' && $zipcodeId) {
-            $lead = Lead::query()
-                ->where('stripe_subscription_id', $stripeSubscriptionId)
-                ->first();
-
-            $lead?->update([
-                'internal_comments' => trim(($lead->internal_comments ?? '')."\nStripe subscription canceled on ".now()->toDateTimeString()),
-            ]);
-        }
-
         if ($localSubscription && empty($localSubscription->billing_interval)) {
             $interval = $subscription->metadata['billing_interval'] ?? null;
             if ($interval) {
@@ -302,7 +322,6 @@ class StripeSubscriptionService
                 'user_id' => $localSubscription?->user_id,
                 'user_zipcode_subscription_id' => $localSubscription?->id,
                 'zipcode_id' => $localSubscription?->zipcode_ids[0] ?? null,
-                'lead_id' => Lead::query()->where('stripe_subscription_id', $subscriptionId)->value('id'),
                 'stripe_customer_id' => is_string($invoice->customer) ? $invoice->customer : $invoice->customer?->id,
                 'stripe_subscription_id' => $subscriptionId,
                 'stripe_payment_intent_id' => is_string($invoice->payment_intent) ? $invoice->payment_intent : $invoice->payment_intent?->id,
@@ -491,10 +510,13 @@ class StripeSubscriptionService
         $this->syncLocalSubscriptionPeriod($subscription, $updatedStripeSubscription);
     }
 
-    protected function resolveCustomerUser(Lead $lead, ?string $stripeCustomerId, ?string $email): User
+    /**
+     * @param  array{name: string, email: string, phone?: string|null}  $customer
+     */
+    protected function resolveCustomerUser(array $customer, ?string $stripeCustomerId, ?string $email): User
     {
         $user = User::query()
-            ->where('email', $email ?: $lead->email)
+            ->where('email', $email ?: $customer['email'])
             ->first();
 
         if ($user) {
@@ -505,16 +527,16 @@ class StripeSubscriptionService
             return $user;
         }
 
-        $nameParts = preg_split('/\s+/', trim($lead->name), 2) ?: [];
+        $nameParts = preg_split('/\s+/', trim($customer['name']), 2) ?: [];
         $firstName = $nameParts[0] ?? 'Customer';
         $lastName = $nameParts[1] ?? '';
 
         $user = User::create([
             'first_name' => $firstName,
             'last_name' => $lastName,
-            'name' => $lead->name,
-            'email' => $email ?: $lead->email,
-            'phone' => $lead->phone,
+            'name' => $customer['name'],
+            'email' => $email ?: $customer['email'],
+            'phone' => $customer['phone'] ?? null,
             'password' => Hash::make(Str::random(32)),
             'role' => 'customer',
             'status' => 'active',
@@ -563,6 +585,21 @@ class StripeSubscriptionService
             'stripe_customer_id' => $stripeCustomerId,
             'billing_interval' => $billingInterval,
         ]);
+    }
+
+    protected function resolveCheckoutPayment(CheckoutSession $session, array $metadata): ?StripePayment
+    {
+        if ($paymentId = $metadata['stripe_payment_id'] ?? null) {
+            $payment = StripePayment::query()->find($paymentId);
+
+            if ($payment) {
+                return $payment;
+            }
+        }
+
+        return StripePayment::query()
+            ->where('stripe_checkout_session_id', $session->id)
+            ->first();
     }
 
     protected function resolveStripeSubscription(CheckoutSession $session, ?string $subscriptionId): ?Subscription
@@ -641,22 +678,47 @@ class StripeSubscriptionService
             : now()->addMonth()->toDateString();
     }
 
-    protected function assertZipcodeAvailable(Zipcode $zipcode): void
+    protected function assertZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null): void
     {
-        if (! $this->isZipcodeAvailable($zipcode)) {
+        if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId)) {
             throw new \RuntimeException('This ZIP code is no longer available.');
         }
     }
 
-    protected function isZipcodeAvailable(Zipcode $zipcode): bool
+    protected function isZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null): bool
     {
         if (! $zipcode->is_active) {
             return false;
         }
 
-        return ! UserZipcodeSubscription::active()
-            ->forZipcode($zipcode->id)
-            ->exists();
+        if (UserZipcodeSubscription::active()->forZipcode($zipcode->id)->exists()) {
+            return false;
+        }
+
+        if (CheckoutHold::isZipcodeHeld($zipcode->id, $exceptHoldId)) {
+            return false;
+        }
+
+        return ! Waitlist::isZipcodeLocked($zipcode->code);
+    }
+
+    /**
+     * @param  array<string, mixed>  $metadata
+     */
+    protected function releaseWaitlistLock(array $metadata, StripePayment $payment): void
+    {
+        $waitlistId = $metadata['waitlist_id'] ?? $payment->metadata['waitlist_id'] ?? null;
+
+        if (blank($waitlistId)) {
+            return;
+        }
+
+        Waitlist::query()
+            ->whereKey($waitlistId)
+            ->update([
+                'locked_until' => null,
+                'status' => 'archived',
+            ]);
     }
 
     protected function resolveBillingIntervalFromStripe(string $subscriptionId): string

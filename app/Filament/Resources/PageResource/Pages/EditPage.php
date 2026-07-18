@@ -32,7 +32,10 @@ class EditPage extends EditRecord
                 ))
                 ->openUrlInNewTab(),
 
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->requiresConfirmation()
+                ->modalHeading('Delete page')
+                ->modalDescription('Are you sure you want to delete this page? This action cannot be undone.'),
         ];
     }
 

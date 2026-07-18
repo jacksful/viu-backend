@@ -22,7 +22,7 @@ class ZipcodeValidationSettingsPage extends Page implements HasForms
 
     protected static ?string $title = 'Zipcode Validation Settings';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 5;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 

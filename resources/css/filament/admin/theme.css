@@ -15,4 +15,85 @@
             @apply h-auto max-w-full;
         }
     }
+
+    .fi-client-activity-timeline {
+        @apply relative;
+    }
+
+    .fi-client-activity-timeline::before {
+        content: '';
+        @apply absolute start-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700;
+    }
+
+    .fi-client-activity-item {
+        @apply relative pb-6 ps-6 last:pb-0;
+    }
+
+    .fi-client-activity-dot {
+        @apply absolute start-0 top-1.5 size-3.5 rounded-full ring-4 ring-white dark:ring-gray-900;
+    }
+
+    .fi-client-activity-dot-latest {
+        @apply bg-primary-500;
+    }
+
+    .fi-client-activity-dot-default {
+        @apply bg-gray-300 dark:bg-gray-600;
+    }
+
+    .fi-admin-notifications-panel {
+        @apply w-96 max-w-[calc(100vw-2rem)];
+    }
+
+    .fi-admin-notifications-header {
+        @apply flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-white/10;
+    }
+
+    .fi-admin-notifications-heading {
+        @apply flex items-center gap-2 text-sm font-semibold text-gray-950 dark:text-white;
+    }
+
+    .fi-admin-notifications-mark-all {
+        @apply text-xs font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300;
+    }
+
+    .fi-admin-notifications-list {
+        @apply max-h-96 overflow-y-auto;
+    }
+
+    .fi-admin-notifications-item {
+        @apply flex w-full items-start gap-3 border-b border-gray-100 px-4 py-3 text-start transition hover:bg-gray-50 dark:border-white/5 dark:hover:bg-white/5;
+    }
+
+    .fi-admin-notifications-item-icon {
+        @apply mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300;
+    }
+
+    .fi-admin-notifications-item-content {
+        @apply flex min-w-0 flex-1 flex-col gap-1;
+    }
+
+    .fi-admin-notifications-item-title {
+        @apply text-sm font-semibold text-gray-950 dark:text-white;
+    }
+
+    .fi-admin-notifications-item-description {
+        @apply text-sm text-gray-600 dark:text-gray-300;
+    }
+
+    .fi-admin-notifications-item-time {
+        @apply text-xs text-gray-500 dark:text-gray-400;
+    }
+
+    .fi-admin-notifications-item-dot {
+        @apply mt-2 size-2 shrink-0 rounded-full bg-primary-500;
+    }
+
+    .fi-admin-notifications-empty {
+        @apply flex flex-col items-center gap-2 px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400;
+    }
+
+    .fi-topbar-actions {
+        @apply flex items-center gap-x-4;
+    }
 }

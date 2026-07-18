@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DatasetResource\Pages;
 
+use App\Exports\DatasetImportTemplateExport;
 use App\Filament\Resources\DatasetResource;
 use App\Models\Dataset;
 use App\Models\UploadedZipcode;
@@ -10,6 +11,8 @@ use Filament\Resources\Pages\ManageRecords;
 use Filament\Schemas\Components\Grid;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Excel as ExcelFormat;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManageDatasets extends ManageRecords
 {
@@ -18,9 +21,20 @@ class ManageDatasets extends ManageRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('downloadSampleCsv')
+                ->label('Sample CSV')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->tooltip('Download a sample CSV with the required column headers and example rows.')
+                ->action(fn (): \Symfony\Component\HttpFoundation\BinaryFileResponse => Excel::download(
+                    new DatasetImportTemplateExport,
+                    'dataset-import-sample.csv',
+                    ExcelFormat::CSV
+                )),
+
             Actions\CreateAction::make()
                 ->modalHeading('Upload Dataset')
-                ->modalSubheading('Select ZIP code and upload CSV file')
+                ->modalSubheading('Select ZIP code and upload a CSV file. Download Sample CSV for the required format.')
                 ->modalWidth('3xl')
                 ->modalSubmitActionLabel('Validate & Preview')
                 ->modalCancelActionLabel('Cancel')
@@ -109,7 +123,7 @@ class ManageDatasets extends ManageRecords
                                 ->directory('datasets/csv')
                                 ->visibility('private')
                                 ->maxSize(102400)
-                                ->helperText('CSV files only (max 100MB)'),
+                                ->helperText('CSV files only (max 100MB). Use Sample CSV above for the required column format.'),
 
                             \Filament\Forms\Components\Select::make('status')
                                 ->label('Status')

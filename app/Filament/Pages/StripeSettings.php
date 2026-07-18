@@ -19,9 +19,9 @@ class StripeSettings extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationLabel = 'Stripe Settings';
+    protected static ?string $navigationLabel = 'Payments & Stripe';
 
-    protected static ?string $title = 'Stripe Settings';
+    protected static ?string $title = 'Payments & Stripe Settings';
 
     protected static ?int $navigationSort = 3;
 

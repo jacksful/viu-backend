@@ -425,14 +425,14 @@
     var leadForm  = $('[data-viu-modal-lead]', modal);
     var leadError = $('[data-viu-modal-lead-error]', modal);
     var leadBtn   = leadForm ? $('button[type="submit"]', leadForm) : null;
-    var contactForm  = $('[data-viu-modal-contact]', modal);
-    var contactError = $('[data-viu-modal-contact-error]', modal);
-    var contactBtn   = contactForm ? $('button[type="submit"]', contactForm) : null;
+    var waitlistForm  = $('[data-viu-waitlist-form]', modal);
+    var waitlistError = $('[data-viu-waitlist-error]', modal);
+    var waitlistBtn   = waitlistForm ? $('button[type="submit"]', waitlistForm) : null;
     var contactMsgEl = $('[data-viu-modal-contact-message]', modal);
     var contactTitleEl = $('[data-viu-modal-contact-title]', modal);
     var unavailableMsgEl = $('[data-viu-modal-unavailable-message]', modal);
     var unavailableTitleEl = $('[data-viu-modal-unavailable-title]', modal);
-    var contactZipInput = contactForm ? $('input[name="zipCode"]', contactForm) : null;
+    var waitlistZipInput = waitlistForm ? $('input[name="zipCode"]', waitlistForm) : null;
     var currentZipcode = null;
     var currentZip = '';
     var selectedBillingInterval = 'month';
@@ -477,11 +477,11 @@
           if (contactMsgEl) {
             contactMsgEl.textContent = data.message || ('ZIP code ' + zip + ' is currently unavailable. Contact us and we will follow up.');
           }
-          if (contactZipInput) contactZipInput.value = zip;
-          if (contactForm) contactForm.reset();
-          if (contactZipInput) contactZipInput.value = zip;
-          showErr(contactError, '');
-          clearFormFieldErrors(contactForm);
+          if (waitlistZipInput) waitlistZipInput.value = zip;
+          if (waitlistForm) waitlistForm.reset();
+          if (waitlistZipInput) waitlistZipInput.value = zip;
+          showErr(waitlistError, '');
+          clearFormFieldErrors(waitlistForm);
           setStep('contact');
         } else {
           currentZipcode = null;
@@ -510,10 +510,10 @@
       modal.hidden = false;
       document.body.classList.add('viu-modal-open');
       setStep('zip-search');
-      showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
+      showErr(errorEl, ''); showErr(leadError, ''); showErr(waitlistError, '');
       setFieldError(zipInput, '');
       clearFormFieldErrors(leadForm);
-      clearFormFieldErrors(contactForm);
+      clearFormFieldErrors(waitlistForm);
       if (zipInput && typeof prefill === 'string') zipInput.value = prefill.replace(/\D/g, '').slice(0, 5);
       if (zipInput) setTimeout(function () { zipInput.focus(); }, 50);
       if (zipInput && /^\d{5}$/.test(zipInput.value)) check();
@@ -530,11 +530,11 @@
         selectedBillingInterval = 'month';
         if (zipInput) zipInput.value = '';
         if (leadForm) leadForm.reset();
-        if (contactForm) contactForm.reset();
-        showErr(errorEl, ''); showErr(leadError, ''); showErr(contactError, '');
+        if (waitlistForm) waitlistForm.reset();
+        showErr(errorEl, ''); showErr(leadError, ''); showErr(waitlistError, '');
         setFieldError(zipInput, '');
         clearFormFieldErrors(leadForm);
-        clearFormFieldErrors(contactForm);
+        clearFormFieldErrors(waitlistForm);
         resetTimer = null;
       }, 250);
     };
@@ -559,7 +559,7 @@
     }
 
     bindFieldValidationClear(leadForm);
-    bindFieldValidationClear(contactForm);
+    bindFieldValidationClear(waitlistForm);
 
     if (leadForm) leadForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -618,24 +618,23 @@
       });
     });
 
-    if (contactForm) contactForm.addEventListener('submit', function (e) {
+    if (waitlistForm) waitlistForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (!validateContactFields(contactForm)) { showErr(contactError, ''); return; }
-      var fd = new FormData(contactForm);
+      if (!validateContactFields(waitlistForm)) { showErr(waitlistError, ''); return; }
+      var fd = new FormData(waitlistForm);
       var data = {};
       fd.forEach(function (v, k) { data[k] = v; });
       if (data.phone) data.phone = formatUsPhone(data.phone);
-      showErr(contactError, '');
-      var endpoint = config.contactStoreUrl || contactForm.getAttribute('data-endpoint');
-      withLoading(contactBtn, function () {
-        if (!endpoint) return Promise.resolve();
+      showErr(waitlistError, '');
+      var endpoint = config.waitlistStoreUrl || waitlistForm.getAttribute('data-endpoint');
+      if (!endpoint) { showErr(waitlistError, 'Waitlist submission is unavailable. Please try again.'); return; }
+      withLoading(waitlistBtn, function () {
         var body = new FormData();
         body.append('_token', config.csrfToken || '');
         body.append('name', data.name || '');
         body.append('email', data.email || '');
         body.append('phone', data.phone || '');
-        body.append('zip_of_interest', data.zipCode || currentZip || '');
-        body.append('subject', 'ZIP territory inquiry');
+        body.append('zip_code', data.zipCode || currentZip || '');
         body.append('message', data.message || ('Interested in ZIP ' + (data.zipCode || currentZip || '') + ' which is currently unavailable.'));
         return fetch(endpoint, {
           method: 'POST',
@@ -645,10 +644,10 @@
       }).then(function () { setStep('contact-success'); })
         .catch(function (err) {
           if (err.payload && err.payload.errors) {
-            applyServerFieldErrors(contactForm, err.payload.errors);
-            showErr(contactError, '');
+            applyServerFieldErrors(waitlistForm, err.payload.errors);
+            showErr(waitlistError, '');
           } else {
-            showErr(contactError, err.message || 'Network error. Please try again.');
+            showErr(waitlistError, err.message || 'Network error. Please try again.');
           }
         });
     });
@@ -659,8 +658,8 @@
       currentZipcode = null;
       currentZip = '';
       selectedBillingInterval = 'month';
-      showErr(contactError, '');
-      clearFormFieldErrors(contactForm);
+      showErr(waitlistError, '');
+      clearFormFieldErrors(waitlistForm);
       if (zipInput) { zipInput.value = ''; zipInput.focus(); }
     };
     var retry = $('[data-viu-modal-retry]', modal);

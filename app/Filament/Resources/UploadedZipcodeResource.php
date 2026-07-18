@@ -19,6 +19,8 @@ class UploadedZipcodeResource extends Resource
 {
     protected static ?string $model = UploadedZipcode::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationLabel = 'Uploaded ZIP Codes';
 
     protected static ?int $navigationSort = 1;
@@ -30,7 +32,7 @@ class UploadedZipcodeResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Data Management';
+        return 'Market';
     }
 
     public static function form(Schema $schema): Schema
@@ -227,7 +229,8 @@ class UploadedZipcodeResource extends Resource
                     ->preload(),
             ])
             ->actions([
-                Actions\Action::make('view_datasets')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('view_datasets')
                     ->label('View Datasets')
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -267,11 +270,18 @@ class UploadedZipcodeResource extends Resource
                     ->modalHeading('Edit Uploaded ZIP Code')
                     ->modalWidth('5xl'),
 
-                Actions\DeleteAction::make(),
+                Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete uploaded zipcode')
+                    ->modalDescription('Are you sure you want to delete this uploaded zipcode? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
+                    Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Delete selected uploads')
+                        ->modalDescription('Are you sure you want to delete the selected uploaded zipcodes? This action cannot be undone.'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')

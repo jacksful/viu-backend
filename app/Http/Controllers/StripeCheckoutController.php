@@ -120,6 +120,24 @@ class StripeCheckoutController extends Controller
         ]);
     }
 
+    public function cancel(Request $request)
+    {
+        $sessionId = $request->query('session_id');
+
+        if ($sessionId && $this->stripe->isEnabled()) {
+            try {
+                $session = $this->stripe->client()->checkout->sessions->retrieve($sessionId);
+                $this->subscriptions->handleCheckoutCancelled($session);
+            } catch (\Throwable) {
+                //
+            }
+        }
+
+        $cancelUrl = $this->stripe->settings()->cancel_url ?: url('/?checkout=cancelled');
+
+        return redirect()->to($cancelUrl);
+    }
+
     /**
      * @return array{
      *     order_number: string,

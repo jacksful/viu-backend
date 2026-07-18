@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Cms\Support\SiteNavigation;
+use App\Filament\Livewire\AdminNotificationsDropdown;
 use App\Models\CmsAboutHeroSection;
 use App\Models\CmsAboutMissionSection;
 use App\Models\CmsAboutPrinciplesSection;
@@ -15,11 +16,14 @@ use App\Models\CmsTerritoryZipSection;
 use App\Models\Contact;
 use App\Models\EmailSetting;
 use App\Models\StripeSetting;
+use App\Models\Waitlist;
 use App\Observers\ContactObserver;
+use App\Observers\WaitlistObserver;
 use App\Observers\InvalidateCmsApiCache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,6 +69,9 @@ class AppServiceProvider extends ServiceProvider
         CmsAboutPrinciplesSection::observe($observer);
 
         Contact::observe(ContactObserver::class);
+        Waitlist::observe(WaitlistObserver::class);
+
+        Livewire::component(AdminNotificationsDropdown::class);
 
         View::composer(['components.header', 'components.footer'], function ($view): void {
             $view->with([

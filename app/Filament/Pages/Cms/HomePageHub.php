@@ -14,7 +14,7 @@ class HomePageHub extends Page
 
     protected static ?string $title = 'Home Page';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?int $navigationSort = 10;
 

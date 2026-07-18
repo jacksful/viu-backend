@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use App\Notifications\CustomerVerifyEmail;
 use Illuminate\Auth\Notifications\VerifyEmail;
 
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -90,6 +91,15 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         };
     }
 
+    public function getFilamentAvatarUrl(): ?string
+    {
+        if (! filled($this->profile_photo_path)) {
+            return null;
+        }
+
+        return $this->profile_photo_url ?: null;
+    }
+
     public function zipcodeSubscriptions()
     {
         return $this->hasMany(UserZipcodeSubscription::class);
@@ -103,6 +113,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function customerIntakes()
     {
         return $this->hasMany(CustomerIntake::class);
+    }
+
+    public function clientActivityLogs()
+    {
+        return $this->hasMany(ClientActivityLog::class);
     }
 
     /**

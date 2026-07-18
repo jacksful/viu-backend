@@ -3,15 +3,32 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 use Filament\Forms\Components;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Tabs\Tab;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
 class ManageUsers extends ManageRecords
 {
   protected static string $resource = UserResource::class;
+
+  public function getTabs(): array
+  {
+    return [
+      'all' => Tab::make('All')
+        ->badge(fn (): int => User::query()->count()),
+      'admin' => Tab::make('Admins')
+        ->badge(fn (): int => User::query()->where('role', 'admin')->count())
+        ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('role', 'admin')),
+      'customer' => Tab::make('Customers')
+        ->badge(fn (): int => User::query()->where('role', 'customer')->count())
+        ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('role', 'customer')),
+    ];
+  }
 
   protected function getHeaderActions(): array
   {

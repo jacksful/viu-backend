@@ -18,13 +18,13 @@ class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
 
-    protected static ?string $navigationLabel = 'Waitlist';
+    protected static ?string $navigationLabel = 'Inquiries';
 
-    protected static ?string $modelLabel = 'Waitlist entry';
+    protected static ?string $modelLabel = 'Inquiry';
 
-    protected static ?string $pluralModelLabel = 'Waitlist';
+    protected static ?string $pluralModelLabel = 'Inquiries';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-queue-list';
 
@@ -35,7 +35,7 @@ class ContactResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Customer Management';
+        return 'Sales';
     }
 
     public static function form(Schema $schema): Schema
@@ -234,7 +234,8 @@ class ContactResource extends Resource
                     }),
             ])
             ->actions([
-                Actions\Action::make('view')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -277,6 +278,7 @@ class ContactResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Delete submission')
                     ->modalDescription('Are you sure you want to delete this submission? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

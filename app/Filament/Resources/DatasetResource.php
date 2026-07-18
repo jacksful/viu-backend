@@ -22,7 +22,7 @@ class DatasetResource extends Resource
 {
   protected static ?string $model = Dataset::class;
 
-  protected static ?string $navigationLabel = 'Dataset Management';
+  protected static ?string $navigationLabel = 'Datasets';
 
   protected static ?int $navigationSort = 2;
 
@@ -33,7 +33,7 @@ class DatasetResource extends Resource
 
   public static function getNavigationGroup(): ?string
   {
-    return 'Data Management';
+    return 'Market';
   }
 
   public static function form(Schema $schema): Schema
@@ -192,7 +192,8 @@ class DatasetResource extends Resource
           ->preload(),
       ])
       ->actions([
-        Actions\ViewAction::make()
+        Actions\ActionGroup::make([
+          Actions\ViewAction::make()
           ->icon('heroicon-o-eye'),
         Actions\Action::make('download')
           ->label('Download')
@@ -214,11 +215,18 @@ class DatasetResource extends Resource
         Actions\EditAction::make()
           ->modalHeading('Edit Dataset')
           ->modalWidth('5xl'),
-        Actions\DeleteAction::make(),
+        Actions\DeleteAction::make()
+          ->requiresConfirmation()
+          ->modalHeading('Delete dataset')
+          ->modalDescription('Are you sure you want to delete this dataset? This action cannot be undone.'),
+        ]),
       ])
       ->bulkActions([
         Actions\BulkActionGroup::make([
-          Actions\DeleteBulkAction::make(),
+          Actions\DeleteBulkAction::make()
+            ->requiresConfirmation()
+            ->modalHeading('Delete selected datasets')
+            ->modalDescription('Are you sure you want to delete the selected datasets? This action cannot be undone.'),
         ]),
       ])
       ->defaultSort('created_at', 'desc')

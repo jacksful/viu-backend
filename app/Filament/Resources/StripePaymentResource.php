@@ -14,19 +14,19 @@ class StripePaymentResource extends Resource
 {
     protected static ?string $model = StripePayment::class;
 
-    protected static ?string $navigationLabel = 'Stripe Payments';
+    protected static ?string $navigationLabel = 'Subscriptions';
 
-    protected static ?string $modelLabel = 'Stripe payment';
+    protected static ?string $modelLabel = 'Subscription';
 
-    protected static ?string $pluralModelLabel = 'Stripe Payments';
+    protected static ?string $pluralModelLabel = 'Subscriptions';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Report';
+        return 'Sales';
     }
 
     public static function form(Schema $schema): Schema
@@ -160,7 +160,9 @@ class StripePaymentResource extends Resource
                     ]),
             ])
             ->actions([
-                \Filament\Actions\ViewAction::make(),
+                \Filament\Actions\ActionGroup::make([
+                    \Filament\Actions\ViewAction::make(),
+                ]),
             ])
             ->bulkActions([]);
     }

@@ -64,7 +64,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
             </span>
             <h3 class="viu-modal__title">Redirecting to checkout</h3>
-            <p class="viu-modal__msg">ZIP code <strong data-viu-modal-zipout></strong> is reserved for checkout.</p>
+            <p class="viu-modal__msg">Complete secure checkout for ZIP <strong data-viu-modal-zipout></strong> on Stripe.</p>
             <p class="viu-modal__msg viu-modal__msg--sm">Complete payment on Stripe to activate your territory subscription. Check your email for account access after payment.</p>
             <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
         </div>
@@ -77,7 +77,7 @@
                 <h3 class="viu-modal__title" data-viu-modal-contact-title>ZIP unavailable</h3>
                 <p class="viu-modal__sub" data-viu-modal-contact-message></p>
             </div>
-            <form class="viu-contact" data-viu-modal-contact novalidate>
+            <form class="viu-contact" data-viu-waitlist-form data-endpoint="{{ route('waitlists.store') }}" novalidate>
                 <div class="viu-contact__grid">
                     <div class="viu-field">
                         <label class="u-visually-hidden" for="modal-contact-name">Full name</label>
@@ -105,8 +105,8 @@
                     <textarea class="viu-input viu-textarea" id="modal-contact-message" name="message" rows="3" placeholder="Tell us about your market (optional)"></textarea>
                     <p class="viu-field-error" data-viu-field-error hidden role="alert"></p>
                 </div>
-                <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Contact a specialist</button>
-                <p class="viu-modal__error" data-viu-modal-contact-error hidden></p>
+                <button type="submit" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full">Submit to waitlist</button>
+                <p class="viu-modal__error" data-viu-waitlist-error hidden></p>
             </form>
             <button type="button" class="viu-btn viu-btn--ghost viu-btn--md viu-btn--full viu-modal__retry" data-viu-modal-retry-contact>Try another ZIP</button>
         </div>
@@ -115,8 +115,8 @@
             <span class="viu-modal__icon viu-modal__icon--success">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
             </span>
-            <h3 class="viu-modal__title">Message sent!</h3>
-            <p class="viu-modal__msg viu-modal__msg--sm">Thank you. A territory specialist will contact you about ZIP <strong data-viu-modal-zipout></strong>.</p>
+            <h3 class="viu-modal__title">You're on the waitlist!</h3>
+            <p class="viu-modal__msg viu-modal__msg--sm">Thank you. We'll notify you if ZIP <strong data-viu-modal-zipout></strong> becomes available.</p>
             <button type="button" class="viu-btn viu-btn--primary viu-btn--md viu-btn--full" data-viu-modal-close>Done</button>
         </div>
 

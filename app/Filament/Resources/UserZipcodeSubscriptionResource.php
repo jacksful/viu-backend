@@ -19,13 +19,24 @@ class UserZipcodeSubscriptionResource extends Resource
 {
     protected static ?string $model = UserZipcodeSubscription::class;
 
-    protected static ?string $navigationLabel = 'Client Management';
+    protected static ?string $slug = 'clients';
+
+    protected static ?string $navigationLabel = 'Clients';
+
+    protected static ?string $modelLabel = 'Client';
+
+    protected static ?string $pluralModelLabel = 'Clients';
 
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-user-group';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Sales';
     }
 
     public static function form(Schema $schema): Schema
@@ -115,6 +126,8 @@ class UserZipcodeSubscriptionResource extends Resource
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['user', 'customerIntake.zipcode']))
+            ->recordAction(null)
+            ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
@@ -313,7 +326,12 @@ class UserZipcodeSubscriptionResource extends Resource
                     ),
             ])
             ->actions([
-                Actions\Action::make('viewIntake')
+                Actions\ActionGroup::make([
+                    Actions\ViewAction::make()
+                        ->label('View')
+                        ->icon('heroicon-o-eye'),
+
+                    Actions\Action::make('viewIntake')
                     ->label('Intake')
                     ->icon('heroicon-o-clipboard-document-list')
                     ->color('info')
@@ -401,6 +419,7 @@ class UserZipcodeSubscriptionResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Delete Subscription')
                     ->modalDescription('Are you sure you want to delete this subscription? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
@@ -433,7 +452,7 @@ class UserZipcodeSubscriptionResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading('No subscriptions found')
+            ->emptyStateHeading('No clients found')
             ->emptyStateDescription('Get started by creating a new client subscription.')
             ->emptyStateIcon('heroicon-o-user-group');
     }
@@ -448,7 +467,8 @@ class UserZipcodeSubscriptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageUserZipcodeSubscriptions::route(''),
+            'index' => Pages\ManageUserZipcodeSubscriptions::route('/'),
+            'view' => Pages\ViewClient::route('/{record}'),
         ];
     }
 

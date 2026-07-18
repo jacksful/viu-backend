@@ -14,7 +14,7 @@ class AboutHub extends Page
 
     protected static ?string $title = 'About';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?int $navigationSort = 20;
 

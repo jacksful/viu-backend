@@ -22,10 +22,16 @@ class UserResource extends Resource
     protected static ?string $navigationLabel = 'Users';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 6;
+
     public static function getNavigationIcon(): ?string
     {
         return 'heroicon-o-user';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Settings';
     }
 
     public static function form(Schema $schema): Schema
@@ -230,14 +236,6 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('role')
-                    ->label('Role')
-                    ->options([
-                        'admin' => 'Admin',
-                        'customer' => 'Customer',
-                    ])
-                    ->multiple(),
-
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
                     ->options([
@@ -260,7 +258,8 @@ class UserResource extends Resource
                     ),
             ])
             ->actions([
-                Actions\Action::make('toggleStatus')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('toggleStatus')
                     ->label(fn(User $record): string => $record->status === 'active' ? 'Deactivate' : 'Activate')
                     ->icon(fn(User $record): string => $record->status === 'active' ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn(User $record): string => $record->status === 'active' ? 'danger' : 'success')
@@ -286,6 +285,7 @@ class UserResource extends Resource
                     ->modalHeading('Delete User')
                     ->modalDescription('Are you sure you want to delete this user? This action cannot be undone.')
                     ->visible(fn(User $record): bool => Auth::user()->id !== $record->id),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

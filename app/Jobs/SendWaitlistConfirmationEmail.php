@@ -3,9 +3,9 @@
 namespace App\Jobs;
 
 use App\Mail\WaitlistConfirmationMail;
-use App\Models\Contact;
 use App\Models\EmailSetting;
 use App\Models\UserZipcodeSubscription;
+use App\Models\Waitlist;
 use App\Models\Zipcode;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,32 +19,32 @@ class SendWaitlistConfirmationEmail implements ShouldBeUnique, ShouldQueue
     use Queueable;
 
     public function __construct(
-        public int $contactId,
+        public int $waitlistId,
     ) {}
 
     public function uniqueId(): string
     {
-        return 'waitlist-confirmation:'.$this->contactId;
+        return 'waitlist-confirmation:'.$this->waitlistId;
     }
 
     public function handle(): void
     {
         EmailSetting::applyMailConfig();
 
-        $contact = Contact::query()->find($this->contactId);
+        $waitlist = Waitlist::query()->find($this->waitlistId);
 
-        if (! $contact || blank($contact->email) || blank($contact->zip_of_interest)) {
+        if (! $waitlist || blank($waitlist->email) || blank($waitlist->zip_code)) {
             return;
         }
 
-        $zipCode = trim((string) $contact->zip_of_interest);
-        $firstName = filled($contact->name)
-            ? (explode(' ', trim($contact->name), 2)[0] ?: 'there')
+        $zipCode = trim((string) $waitlist->zip_code);
+        $firstName = filled($waitlist->name)
+            ? (explode(' ', trim($waitlist->name), 2)[0] ?: 'there')
             : 'there';
 
-        $waitlistPosition = Contact::query()
-            ->where('zip_of_interest', $zipCode)
-            ->where('id', '<=', $contact->id)
+        $waitlistPosition = Waitlist::query()
+            ->where('zip_code', $zipCode)
+            ->where('id', '<=', $waitlist->id)
             ->count();
 
         $territoryStatus = $this->resolveTerritoryStatus($zipCode);
@@ -52,7 +52,7 @@ class SendWaitlistConfirmationEmail implements ShouldBeUnique, ShouldQueue
             ?: 'mailto:'.(config('mail.from.address') ?: 'support@fullviu.com');
 
         try {
-            Mail::to($contact->email)->send(new WaitlistConfirmationMail(
+            Mail::to($waitlist->email)->send(new WaitlistConfirmationMail(
                 firstName: $firstName,
                 zipCode: $zipCode,
                 territoryStatus: $territoryStatus,
@@ -61,8 +61,8 @@ class SendWaitlistConfirmationEmail implements ShouldBeUnique, ShouldQueue
             ));
         } catch (Throwable $exception) {
             Log::error('Failed to send waitlist confirmation email.', [
-                'contact_id' => $contact->id,
-                'recipient' => $contact->email,
+                'waitlist_id' => $waitlist->id,
+                'recipient' => $waitlist->email,
                 'error' => $exception->getMessage(),
             ]);
 

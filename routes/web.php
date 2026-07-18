@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\CustomerEmailVerificationController;
 use App\Http\Controllers\Auth\CustomerVerificationNoticeController;
 use App\Http\Controllers\Auth\CustomerVerificationResendController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\WaitlistController;
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\Customer\FeedbackController;
 use App\Http\Controllers\Customer\NotificationController;
@@ -88,6 +89,7 @@ Route::post('/leads/check-availability', [LeadController::class, 'checkAvailabil
 // Stripe checkout & webhooks
 Route::post('/stripe/checkout', [StripeCheckoutController::class, 'create'])->name('stripe.checkout');
 Route::get('/stripe/checkout/success', [StripeCheckoutController::class, 'success'])->name('stripe.checkout.success');
+Route::get('/stripe/checkout/cancel', [StripeCheckoutController::class, 'cancel'])->name('stripe.checkout.cancel');
 Route::post('/stripe/webhook', StripeWebhookController::class)->name('stripe.webhook');
 
 Route::middleware('signed')->prefix('intake')->name('intake.')->group(function () {
@@ -97,6 +99,9 @@ Route::middleware('signed')->prefix('intake')->name('intake.')->group(function (
 
 // Contact form submission route (public)
 Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+
+// ZIP waitlist form submission route (public)
+Route::post('/waitlists', [WaitlistController::class, 'store'])->name('waitlists.store');
 
 // User-facing auth: URL prefix `user/*`; `user.*` route names only inside the inner group so `verification.*` matches Laravel defaults.
 Route::prefix('user')->group(function () {

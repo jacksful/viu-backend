@@ -20,7 +20,7 @@ class FeedbackResource extends Resource
 
     protected static ?string $navigationLabel = 'Feedback';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 2;
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     public static function getNavigationIcon(): ?string
@@ -30,7 +30,7 @@ class FeedbackResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Customer Management';
+        return 'Website';
     }
 
     public static function form(Schema $schema): Schema
@@ -199,7 +199,8 @@ class FeedbackResource extends Resource
                     }),
             ])
             ->actions([
-                Actions\Action::make('view')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -241,6 +242,7 @@ class FeedbackResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Delete Feedback')
                     ->modalDescription('Are you sure you want to delete this feedback? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([

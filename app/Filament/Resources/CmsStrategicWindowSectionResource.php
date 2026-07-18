@@ -24,7 +24,7 @@ class CmsStrategicWindowSectionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Strategic window';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website';
 
     protected static ?string $navigationParentItem = 'Home Page';
 

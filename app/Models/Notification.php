@@ -44,6 +44,14 @@ class Notification extends Model
     }
 
     /**
+     * Scope a query to only include unread notifications.
+     */
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+
+    /**
      * Mark the notification as read.
      */
     public function markAsRead(): bool

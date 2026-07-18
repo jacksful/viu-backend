@@ -2,12 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\ActiveZipDatasetsWidget;
-use App\Filament\Widgets\RecentActivityWidget;
-use App\Filament\Widgets\TotalClientsWidget;
-use App\Filament\Widgets\TotalLeadsWidget;
-use App\Filament\Widgets\TotalSalesWidget;
-use App\Filament\Widgets\Widgets1;
+use App\Filament\Widgets\DashboardMainColumnWidget;
+use App\Filament\Widgets\DashboardStatsWidget;
+use App\Filament\Widgets\LaunchReadinessWidget;
+use App\Support\AdminDashboardData;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class AdminDashboard extends BaseDashboard
@@ -23,8 +21,9 @@ class AdminDashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            Widgets1::class,
-            RecentActivityWidget::class,
+            DashboardStatsWidget::class,
+            DashboardMainColumnWidget::class,
+            LaunchReadinessWidget::class,
         ];
     }
 
@@ -38,10 +37,11 @@ class AdminDashboard extends BaseDashboard
         return 'Dashboard';
     }
 
-    // public function getSubheading(): ?string
-    // {
-    //     return 'Welcome back! Here\'s what\'s happening today.';
-    // }
+    public function getSubheading(): ?string
+    {
+        return app(AdminDashboardData::class)->formattedDate().' — All numbers link to the list they come from.';
+    }
+
     public function getColumns(): int | array
     {
         return 12;

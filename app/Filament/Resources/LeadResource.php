@@ -23,9 +23,13 @@ class LeadResource extends Resource
 {
     protected static ?string $model = Lead::class;
 
-    protected static ?string $navigationLabel = 'Lead Management';
+    protected static ?string $navigationLabel = 'Leads';
 
-    protected static ?int $navigationSort = 12;
+    protected static ?string $modelLabel = 'Lead';
+
+    protected static ?string $pluralModelLabel = 'Leads';
+
+    protected static ?int $navigationSort = 3;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
@@ -34,10 +38,10 @@ class LeadResource extends Resource
         return 'heroicon-o-user-group';
     }
 
-    // public static function getNavigationGroup(): ?string
-    // {
-    //     return 'Customer Management';
-    // }
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Sales';
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -110,16 +114,6 @@ class LeadResource extends Resource
                             ])
                             ->default('new')
                             ->placeholder('Select status'),
-
-                        Components\Select::make('payment_status')
-                            ->label('Payment Status')
-                            ->required()
-                            ->options([
-                                'paid' => 'Paid',
-                                'unpaid' => 'Unpaid',
-                            ])
-                            ->default('unpaid')
-                            ->placeholder('Select payment status'),
 
                         Components\DatePicker::make('last_contact_date')
                             ->label('Last Contact Date')
@@ -205,16 +199,6 @@ class LeadResource extends Resource
                     ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('payment_status')
-                    ->label('Payment')
-                    ->badge()
-                    ->colors([
-                        'success' => 'paid',
-                        'warning' => 'unpaid',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('next_follow_up_date')
                     ->label('Next Follow-up')
                     ->date('d/m/Y')
@@ -245,14 +229,6 @@ class LeadResource extends Resource
                         'interested' => 'Interested',
                         'contacted' => 'Contacted',
                         'not_interested' => 'Not Interested',
-                    ])
-                    ->multiple(),
-
-                Tables\Filters\SelectFilter::make('payment_status')
-                    ->label('Payment Status')
-                    ->options([
-                        'paid' => 'Paid',
-                        'unpaid' => 'Unpaid',
                     ])
                     ->multiple(),
 
@@ -288,7 +264,8 @@ class LeadResource extends Resource
                     }),
             ])
             ->actions([
-                Actions\Action::make('view')
+                Actions\ActionGroup::make([
+                    Actions\Action::make('view')
                     ->label('View Details')
                     ->icon('heroicon-o-eye')
                     ->color('info')
@@ -338,14 +315,6 @@ class LeadResource extends Resource
                                         'not_interested' => 'Not Interested',
                                     ])
                                     ->default(fn (Lead $record): string => $record->lead_status),
-
-                                Components\Select::make('payment_status')
-                                    ->label('Payment Status')
-                                    ->options([
-                                        'paid' => 'Paid',
-                                        'unpaid' => 'Unpaid',
-                                    ])
-                                    ->default(fn (Lead $record): string => $record->payment_status),
 
                                 Components\DatePicker::make('last_contact_date')
                                     ->label('Last Contact Date')
@@ -484,6 +453,7 @@ class LeadResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Delete Lead')
                     ->modalDescription('Are you sure you want to delete this lead? This action cannot be undone.'),
+                ]),
             ])
             ->bulkActions([
                 Actions\BulkActionGroup::make([
@@ -517,7 +487,7 @@ class LeadResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->emptyStateHeading('No leads found')
-            ->emptyStateDescription('Leads from the landing page will appear here.')
+            ->emptyStateDescription('Waitlist submissions from the landing page will appear here.')
             ->emptyStateIcon('heroicon-o-user-group');
     }
 
@@ -542,6 +512,9 @@ class LeadResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return Auth::user()?->role === 'admin';
+        // Hidden from sidebar — uncomment to show Leads menu again.
+        // return Auth::user()?->role === 'admin';
+
+        return false;
     }
 }
