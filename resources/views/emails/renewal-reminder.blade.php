@@ -5,7 +5,7 @@
     $logoDarkUrl = SiteSettings::logoDarkUrl();
     $supportEmail = SiteSettings::supportEmail() ?? 'support@fullviu.com';
     $phoneNumber = SiteSettings::phoneNumber() ?? '+1 (406) 861-6520';
-    $address = SiteSettings::address() ?? 'Montana markets, USA';
+    $address = SiteSettings::address() ?? 'Billings, Montana, USA';
     $siteTagline = SiteSettings::siteTagline() ?? 'Own the market before they sell';
     $phoneHref = 'tel:'.preg_replace('/\D+/', '', $phoneNumber);
 @endphp
@@ -156,8 +156,9 @@
                 <tr>
                   <td class="px" style="padding:30px 40px 38px 40px;">
                     <p class="body-font" style="margin:0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; line-height:22px; color:#3A3D4D;">
-                      VIU Billing<br>
-                      <a href="mailto:{{ $supportEmail }}" style="color:#1A1C4F; text-decoration:underline;">{{ $supportEmail }}</a><br>
+                      Geoff Crutcher<br>
+                      <span style="color:#5F6677;">VIU Territory Specialist</span><br>
+                      <a href="mailto:geoff@fullviu.com" style="color:#1A1C4F; text-decoration:underline;">geoff@fullviu.com</a><br>
                       <a href="{{ $phoneHref }}" style="color:#1A1C4F; text-decoration:underline;">{{ $phoneNumber }}</a>
                     </p>
                   </td>
@@ -176,7 +177,7 @@
                   </td>
                 </tr>
                 <tr><td align="center" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; line-height:19px; color:#5F6677;">{{ $siteTagline }}<br>{{ $address }}</td></tr>
-                <tr><td align="center" style="padding-top:14px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; line-height:19px; color:#5F6677;">You&rsquo;re receiving this because you have a VIU subscription.<br><a href="{{ $billingPortalUrl }}" style="color:#5F6677; text-decoration:underline;">Manage billing</a>&nbsp; &bull; &nbsp;<a href="{{ $unsubscribeUrl }}" style="color:#5F6677; text-decoration:underline;">Unsubscribe</a>&nbsp; &bull; &nbsp;<a href="mailto:{{ $supportEmail }}" style="color:#5F6677; text-decoration:underline;">Contact us</a></td></tr>
+                <tr><td align="center" style="padding-top:14px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; line-height:19px; color:#5F6677;">You&rsquo;re receiving this because you have a VIU subscription.<br><a href="{{ $billingPortalUrl }}" style="color:#5F6677; text-decoration:underline;">Manage billing</a>&nbsp; &bull; &nbsp;<a href="mailto:{{ $supportEmail }}" style="color:#5F6677; text-decoration:underline;">Contact us</a></td></tr>
               </table>
             </td>
           </tr>

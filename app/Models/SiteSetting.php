@@ -57,7 +57,7 @@ class SiteSetting extends Model
             'support_email' => env('SITE_SUPPORT_EMAIL', 'support@fullviu.com'),
             'phone_number' => env('SITE_PHONE_NUMBER'),
             'whatsapp_number' => env('SITE_WHATSAPP_NUMBER'),
-            'address' => env('SITE_ADDRESS', 'Montana markets, USA'),
+            'address' => env('SITE_ADDRESS', 'Billings, Montana, USA'),
             'google_map_embed_url' => env('SITE_GOOGLE_MAP_EMBED_URL'),
         ];
     }

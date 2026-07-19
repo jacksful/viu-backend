@@ -4,7 +4,7 @@
     $logoLightUrl = SiteSettings::logoLightUrl();
     $logoDarkUrl = SiteSettings::logoDarkUrl();
     $supportEmail = SiteSettings::supportEmail() ?? 'support@fullviu.com';
-    $address = SiteSettings::address() ?? 'Montana markets, USA';
+    $address = SiteSettings::address() ?? 'Billings, Montana, USA';
     $siteTagline = SiteSettings::siteTagline() ?? 'Own the market before they sell';
     $zipDisplay = filled($contact->zip_of_interest) ? $contact->zip_of_interest : '—';
 @endphp
@@ -163,8 +163,9 @@
                 <tr>
                   <td class="px" style="padding:30px 40px 38px 40px;">
                     <p class="body-font" style="margin:0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; line-height:22px; color:#3A3D4D;">
-                      VIU Admin Notifications<br>
-                      <a href="mailto:{{ $supportEmail }}" style="color:#1A1C4F; text-decoration:underline;">{{ $supportEmail }}</a>
+                      Geoff Crutcher<br>
+                      <span style="color:#5F6677;">VIU Territory Specialist</span><br>
+                      <a href="mailto:geoff@fullviu.com" style="color:#1A1C4F; text-decoration:underline;">geoff@fullviu.com</a>
                     </p>
                   </td>
                 </tr>

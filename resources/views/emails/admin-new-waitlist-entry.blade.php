@@ -4,7 +4,7 @@
     $logoLightUrl = SiteSettings::logoLightUrl();
     $logoDarkUrl = SiteSettings::logoDarkUrl();
     $supportEmail = SiteSettings::supportEmail() ?? 'support@fullviu.com';
-    $address = SiteSettings::address() ?? 'Montana markets, USA';
+    $address = SiteSettings::address() ?? 'Billings, Montana, USA';
     $siteTagline = SiteSettings::siteTagline() ?? 'Own the market before they sell';
 @endphp
 <!DOCTYPE html>
@@ -47,7 +47,11 @@
       <td style="padding:24px 40px 32px; text-align:center; color:#5F6677; font-size:12px;">
         <img src="{{ $logoDarkUrl }}" alt="VIU" width="44" height="28" style="display:inline-block; margin-bottom:12px;">
         <div>{{ $siteTagline }}<br>{{ $address }}</div>
-        <div style="margin-top:12px;"><a href="mailto:{{ $supportEmail }}" style="color:#5F6677;">{{ $supportEmail }}</a></div>
+        <div style="margin-top:12px;">
+          Geoff Crutcher<br>
+          VIU Territory Specialist<br>
+          <a href="mailto:geoff@fullviu.com" style="color:#5F6677;">geoff@fullviu.com</a>
+        </div>
       </td>
     </tr>
   </table>
