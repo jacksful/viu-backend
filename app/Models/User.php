@@ -6,13 +6,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use App\Notifications\CustomerVerifyEmail;
 use Illuminate\Auth\Notifications\VerifyEmail;
 
-class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailAuthentication, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -37,6 +38,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         'email_verified_at',
         'status',
         'password',
+        'password_set_at',
         'remember_token',
         'profile_photo_path',
         'stripe_id',
@@ -64,6 +66,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_set_at' => 'datetime',
         ];
     }
 
@@ -89,6 +92,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             'admin' => $this->role === 'admin',
             default => false,
         };
+    }
+
+    public function hasEmailAuthentication(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function toggleEmailAuthentication(bool $condition): void
+    {
+        // Admin login OTP is always required and cannot be disabled.
     }
 
     public function getFilamentAvatarUrl(): ?string

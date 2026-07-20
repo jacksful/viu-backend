@@ -57,9 +57,9 @@ class Waitlist extends Model
             ->whereHas('stripePayment', fn (Builder $paymentQuery) => $paymentQuery->where('status', 'checkout_pending'));
     }
 
-    public static function isZipcodeLocked(string $zipCode, ?int $exceptWaitlistId = null): bool
+    public static function isZipcodeLocked(string $zipCode, ?int $exceptWaitlistId = null, ?int $exceptHoldId = null): bool
     {
-        if (CheckoutHold::isZipcodeCodeHeld($zipCode)) {
+        if (CheckoutHold::isZipcodeCodeHeld($zipCode, $exceptHoldId)) {
             return true;
         }
 

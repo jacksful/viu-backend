@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components as SchemaComponents;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -132,5 +133,10 @@ class EditProfile extends BaseEditProfile
     public function getHeading(): string
     {
         return 'Edit Profile';
+    }
+
+    public function getMultiFactorAuthenticationContentComponent(): ?Component
+    {
+        return null;
     }
 }

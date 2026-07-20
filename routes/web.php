@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\CustomerEmailVerificationController;
+use App\Livewire\Auth\CustomerLoginPage;
+use App\Livewire\Auth\CustomerRegisterPage;
+use App\Livewire\Auth\CustomerSetPasswordPage;
 use App\Http\Controllers\Auth\CustomerVerificationNoticeController;
 use App\Http\Controllers\Auth\CustomerVerificationResendController;
 use App\Http\Controllers\ContactController;
@@ -108,10 +111,8 @@ Route::prefix('user')->group(function () {
     Route::name('user.')->group(function () {
         // Guest routes
         Route::middleware('guest')->group(function () {
-            Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
-            Route::post('/login', [CustomerAuthController::class, 'login']);
-            Route::get('/register', [CustomerAuthController::class, 'showRegisterForm'])->name('register');
-            Route::post('/register', [CustomerAuthController::class, 'register']);
+            Route::get('/login', CustomerLoginPage::class)->name('login');
+            Route::get('/register', CustomerRegisterPage::class)->name('register');
         });
 
         // Authenticated portal routes (require verified email, customer role)
@@ -145,6 +146,12 @@ Route::prefix('user')->group(function () {
     Route::get('/email/verify/{id}/{hash}', CustomerEmailVerificationController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
+
+    Route::middleware('guest')->group(function () {
+        Route::get('/set-password/{id}/{hash}', CustomerSetPasswordPage::class)
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('password.setup');
+    });
 
     Route::middleware(['auth', EnsureCustomerRole::class])->group(function () {
         Route::get('/email/verify', CustomerVerificationNoticeController::class)

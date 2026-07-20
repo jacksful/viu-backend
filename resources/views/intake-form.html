@@ -278,19 +278,19 @@
                 <input type="file" name="lifestyle" accept=".jpg,.jpeg,.png">
               </label>
             </div>
-            <div class="field reveal" data-required>
-              <label>Brand color 1 <span class="req">*</span></label>
+            <div class="field reveal">
+              <label>Brand color 1 <span class="opt">(optional)</span></label>
               <div class="colorrow">
-                <input type="color" class="swatch" value="#1A1C4F" data-sync="c1">
-                <input type="text" name="color1" id="c1" value="#1A1C4F" pattern="^#?[0-9A-Fa-f]{6}$" required>
+                <input type="color" class="swatch" value="#CCCCCC" data-sync="c1">
+                <input type="text" name="color1" id="c1" placeholder="#1A1C4F" pattern="^#?[0-9A-Fa-f]{6}$">
               </div>
               <span class="err-msg">Enter a 6-digit hex color.</span>
             </div>
-            <div class="field reveal" data-required>
-              <label>Brand color 2 <span class="req">*</span></label>
+            <div class="field reveal">
+              <label>Brand color 2 <span class="opt">(optional)</span></label>
               <div class="colorrow">
-                <input type="color" class="swatch" value="#F57F20" data-sync="c2">
-                <input type="text" name="color2" id="c2" value="#F57F20" pattern="^#?[0-9A-Fa-f]{6}$" required>
+                <input type="color" class="swatch" value="#CCCCCC" data-sync="c2">
+                <input type="text" name="color2" id="c2" placeholder="#F57F20" pattern="^#?[0-9A-Fa-f]{6}$">
               </div>
               <span class="err-msg">Enter a 6-digit hex color.</span>
             </div>
@@ -519,7 +519,7 @@
       ['Name', val('full_name')],
       ['Tagline', val('tagline')],
       ['Files attached', files+' file'+(files===1?'':'s')],
-      ['Brand colors', (val('color1')||'?')+'  +  '+(val('color2')||'?')],
+      ['Brand colors', [val('color1'), val('color2')].filter(Boolean).join('  +  ') || 'Not provided'],
       ['Contact', [val('phone'),val('email')].filter(Boolean).join('   ')],
       ['Brokerage', val('brokerage')],
       ['License', [val('license'),val('state')].filter(Boolean).join('   ')]

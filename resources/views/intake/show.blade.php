@@ -168,6 +168,39 @@
   .btn.ghost:hover{border-color:var(--ink)}
   .btn[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none}
 
+  /* ---------- Toast ---------- */
+  .toast-stack{
+    position:fixed;top:20px;right:20px;z-index:100;display:flex;flex-direction:column;gap:10px;
+    max-width:min(420px,calc(100vw - 40px));pointer-events:none;
+  }
+  .toast{
+    pointer-events:auto;display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+    background:#fff;border:1px solid var(--line);box-shadow:0 10px 30px rgba(26,28,79,.14);
+    font-size:14px;line-height:1.45;color:var(--ink-soft);
+    transform:translateX(calc(100% + 28px));opacity:0;
+    transition:transform .35s cubic-bezier(.2,.7,.2,1),opacity .35s ease;
+  }
+  .toast.show{transform:none;opacity:1}
+  .toast.success{border-left:4px solid var(--ok)}
+  .toast.error{border-left:4px solid var(--err)}
+  .toast-icon{
+    flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:800;line-height:1;margin-top:1px;
+  }
+  .toast.success .toast-icon{background:rgba(21,128,61,.12);color:var(--ok)}
+  .toast.error .toast-icon{background:rgba(180,35,24,.10);color:var(--err)}
+  .toast-body{flex:1;min-width:0}
+  .toast-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px}
+  .toast-msg{color:var(--ink-soft);word-break:break-word}
+  .toast-close{
+    flex:none;background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;
+    line-height:1;padding:0 0 0 4px;transition:color .15s;
+  }
+  .toast-close:hover{color:var(--ink)}
+  @media (max-width:900px){
+    .toast-stack{top:14px;right:14px;left:14px;max-width:none}
+  }
+
   /* ---------- Success ---------- */
   .done-wrap{display:none;flex:1;align-items:center;justify-content:center;padding:40px}
   .done-wrap.show{display:flex}
@@ -202,6 +235,7 @@
 </style>
 </head>
 <body>
+<div id="toast-stack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
 <div class="app">
 
   <!-- ============ LEFT RAIL ============ -->
@@ -284,19 +318,19 @@
                 <input type="file" name="lifestyle" accept=".jpg,.jpeg,.png">
               </label>
             </div>
-            <div class="field reveal" data-required>
-              <label>Brand color 1 <span class="req">*</span></label>
+            <div class="field reveal">
+              <label>Brand color 1 <span class="opt">(optional)</span></label>
               <div class="colorrow">
-                <input type="color" class="swatch" value="#1A1C4F" data-sync="c1">
-                <input type="text" name="color1" id="c1" value="#1A1C4F" pattern="^#?[0-9A-Fa-f]{6}$" required>
+                <input type="color" class="swatch" value="#CCCCCC" data-sync="c1">
+                <input type="text" name="color1" id="c1" placeholder="#1A1C4F" pattern="^#?[0-9A-Fa-f]{6}$">
               </div>
               <span class="err-msg">Enter a 6-digit hex color.</span>
             </div>
-            <div class="field reveal" data-required>
-              <label>Brand color 2 <span class="req">*</span></label>
+            <div class="field reveal">
+              <label>Brand color 2 <span class="opt">(optional)</span></label>
               <div class="colorrow">
-                <input type="color" class="swatch" value="#F57F20" data-sync="c2">
-                <input type="text" name="color2" id="c2" value="#F57F20" pattern="^#?[0-9A-Fa-f]{6}$" required>
+                <input type="color" class="swatch" value="#CCCCCC" data-sync="c2">
+                <input type="text" name="color2" id="c2" placeholder="#F57F20" pattern="^#?[0-9A-Fa-f]{6}$">
               </div>
               <span class="err-msg">Enter a 6-digit hex color.</span>
             </div>
@@ -447,7 +481,33 @@
   var TOTAL=STEPS.length;
   var form=document.getElementById('intake');
   var panels=Array.prototype.slice.call(form.querySelectorAll('.step-panel'));
+  var toastStack=document.getElementById('toast-stack');
   var cur=0, maxReached=0;
+
+  function showToast(type,message,title){
+    var labels={success:'Success',error:'Error'};
+    var icons={success:'✓',error:'!'};
+    var toast=el('div','toast '+type);
+    var icon=el('div','toast-icon',icons[type]||'!');
+    var body=el('div','toast-body');
+    body.appendChild(el('div','toast-title',title||labels[type]||'Notice'));
+    body.appendChild(el('div','toast-msg',message));
+    var close=el('button','toast-close','×');
+    close.type='button';
+    close.setAttribute('aria-label','Dismiss');
+    toast.appendChild(icon);
+    toast.appendChild(body);
+    toast.appendChild(close);
+    toastStack.appendChild(toast);
+    requestAnimationFrame(function(){ toast.classList.add('show'); });
+    var timer=setTimeout(function(){ dismissToast(toast); },6000);
+    function dismissToast(node){
+      clearTimeout(timer);
+      node.classList.remove('show');
+      setTimeout(function(){ if(node.parentNode) node.parentNode.removeChild(node); },350);
+    }
+    close.addEventListener('click',function(){ dismissToast(toast); });
+  }
 
   /* build stepper + dots with DOM (no innerHTML) */
   var ol=document.getElementById('stepper'), dots=document.getElementById('dots');
@@ -478,12 +538,39 @@
     hex.addEventListener('input',function(){var v=hex.value.trim();if(/^#?[0-9A-Fa-f]{6}$/.test(v)){p.value=v[0]==='#'?v:'#'+v;}});
   });
 
+  var MAX_FILE_BYTES=15*1024*1024;
+  function fileTooLarge(file){return file&&file.size>MAX_FILE_BYTES;}
+  function fileSizeLabel(bytes){
+    if(bytes<1024*1024)return Math.ceil(bytes/1024)+' KB';
+    return (bytes/(1024*1024)).toFixed(1)+' MB';
+  }
+
   /* file chosen */
   form.querySelectorAll('.drop[data-file]').forEach(function(d){
     var inp=d.querySelector('input[type=file]'), dt=d.querySelector('.dt'), orig=dt.textContent;
     inp.addEventListener('change',function(){
-      if(inp.files&&inp.files.length){d.classList.add('has');dt.textContent=inp.files[0].name;}
-      else{d.classList.remove('has');dt.textContent=orig;}
+      if(inp.files&&inp.files.length){
+        var file=inp.files[0];
+        if(fileTooLarge(file)){
+          var tooLargeMsg='Each file must be 15 MB or smaller (selected: '+fileSizeLabel(file.size)+').';
+          inp.value='';
+          d.classList.remove('has');
+          dt.textContent=orig;
+          mark(inp,true);
+          var msg=inp.closest('.field')&&inp.closest('.field').querySelector('.err-msg');
+          if(msg){
+            msg.textContent=tooLargeMsg;
+            msg.classList.add('show');
+          }
+          return;
+        }
+        d.classList.add('has');
+        dt.textContent=file.name+' ('+fileSizeLabel(file.size)+')';
+        mark(inp,false);
+      }else{
+        d.classList.remove('has');
+        dt.textContent=orig;
+      }
     });
   });
 
@@ -501,7 +588,7 @@
   function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
   function ok(e){
     if(e.type==='checkbox')return e.checked;
-    if(e.type==='file')return e.files&&e.files.length>0;
+    if(e.type==='file')return e.files&&e.files.length>0&&!fileTooLarge(e.files[0]);
     if(e===tag)return e.value.trim()!==''&&words(e.value)<=8;
     if(e.type==='email')return validEmail(e.value);
     return e.value.trim()!=='';
@@ -525,7 +612,7 @@
       ['Name', val('full_name')],
       ['Tagline', val('tagline')],
       ['Files attached', files+' file'+(files===1?'':'s')],
-      ['Brand colors', (val('color1')||'?')+'  +  '+(val('color2')||'?')],
+      ['Brand colors', [val('color1'), val('color2')].filter(Boolean).join('  +  ') || 'Not provided'],
       ['Contact', [val('phone'),val('email')].filter(Boolean).join('   ')],
       ['Brokerage', val('brokerage')],
       ['License', [val('license'),val('state')].filter(Boolean).join('   ')]
@@ -579,12 +666,22 @@
       headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'},
       credentials:'same-origin'
     }).then(function(res){
-      return res.json().then(function(body){ return {ok:res.ok, body:body}; });
+      return res.text().then(function(text){
+        var body={};
+        try{ body=JSON.parse(text); }catch(e){
+          if(res.status===413||/POST data is too large|Content-Length.*exceeds/i.test(text)){
+            body={message:'Upload too large. Keep each file under 15 MB and try again.'};
+          }else{
+            body={message:'Something went wrong. Please try again.'};
+          }
+        }
+        return {ok:res.ok, body:body};
+      });
     }).then(function(result){
       if(!result.ok){
         nextBtn.disabled=false;
         nextBtn.textContent='Submit intake';
-        alert(result.body.message||'Something went wrong. Please try again.');
+        showToast('error', result.body.message||'Something went wrong. Please try again.');
         return;
       }
       form.style.display='none';
@@ -592,7 +689,7 @@
     }).catch(function(){
       nextBtn.disabled=false;
       nextBtn.textContent='Submit intake';
-      alert('Something went wrong. Please try again.');
+      showToast('error','Something went wrong. Please try again.');
     });
   }
 

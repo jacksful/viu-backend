@@ -76,7 +76,13 @@ class CheckoutHoldService
             return;
         }
 
-        CheckoutHold::query()->whereIn('id', $holdIds)->delete();
+        CheckoutHold::query()
+            ->whereIn('id', $holdIds)
+            ->update([
+                'status' => CheckoutHold::STATUS_COMPLETED,
+                'released_at' => now(),
+                'release_reason' => 'payment_completed',
+            ]);
 
         Waitlist::query()
             ->whereIn('zip_available_notice_sent_for_hold_id', $holdIds)

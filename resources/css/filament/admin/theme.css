@@ -96,4 +96,22 @@
     .fi-topbar-actions {
         @apply flex items-center gap-x-4;
     }
+
+    .fi-resource-checkout-holds {
+        .fi-sc-section > .fi-section > .fi-section-content-ctn {
+            @apply overflow-hidden;
+
+            .fi-sc-tabs {
+                @apply rounded-none border-0 bg-transparent shadow-none ring-0;
+
+                .fi-tabs.fi-contained {
+                    @apply border-0;
+                }
+            }
+
+            .fi-ta-ctn {
+                @apply rounded-none shadow-none ring-0;
+            }
+        }
+    }
 }

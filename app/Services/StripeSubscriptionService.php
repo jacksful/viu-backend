@@ -40,7 +40,11 @@ class StripeSubscriptionService
             $zipcode->id,
         );
 
-        $this->assertZipcodeAvailable($zipcode, $existingHold?->id);
+        $this->assertZipcodeAvailable(
+            $zipcode,
+            $existingHold?->id,
+            $customer['waitlist_id'] ?? $existingHold?->waitlist_id,
+        );
 
         $billingInterval = $customer['billing_interval'] ?? Zipcode::BILLING_MONTHLY;
 
@@ -168,12 +172,10 @@ class StripeSubscriptionService
 
         $fulfilledPaymentId = null;
 
-        DB::transaction(function () use ($payment, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription, $customer, &$fulfilledPaymentId): void {
-            $exceptHoldId = app(CheckoutHoldService::class)
-                ->findActiveHoldForCustomerAndZip($customer['email'], $zipcode->id)
-                ?->id;
+        [$exceptHoldId, $exceptWaitlistId] = $this->resolveFulfillmentExceptions($payment, $zipcode, $customer, $metadata);
 
-            if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId)) {
+        DB::transaction(function () use ($payment, $zipcode, $session, $subscriptionId, $customerId, $billingInterval, $stripeSubscription, $customer, $exceptHoldId, $exceptWaitlistId, &$fulfilledPaymentId): void {
+            if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId, $exceptWaitlistId)) {
                 if ($subscriptionId) {
                     $this->stripe->client()->subscriptions->cancel($subscriptionId);
                 }
@@ -678,14 +680,14 @@ class StripeSubscriptionService
             : now()->addMonth()->toDateString();
     }
 
-    protected function assertZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null): void
+    protected function assertZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null, ?int $exceptWaitlistId = null): void
     {
-        if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId)) {
+        if (! $this->isZipcodeAvailable($zipcode, $exceptHoldId, $exceptWaitlistId)) {
             throw new \RuntimeException('This ZIP code is no longer available.');
         }
     }
 
-    protected function isZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null): bool
+    protected function isZipcodeAvailable(Zipcode $zipcode, ?int $exceptHoldId = null, ?int $exceptWaitlistId = null): bool
     {
         if (! $zipcode->is_active) {
             return false;
@@ -699,7 +701,40 @@ class StripeSubscriptionService
             return false;
         }
 
-        return ! Waitlist::isZipcodeLocked($zipcode->code);
+        return ! Waitlist::isZipcodeLocked($zipcode->code, $exceptWaitlistId, $exceptHoldId);
+    }
+
+    /**
+     * @param  array{name: string, email: string, phone?: string|null}  $customer
+     * @param  array<string, mixed>  $metadata
+     * @return array{0: ?int, 1: ?int}
+     */
+    protected function resolveFulfillmentExceptions(
+        StripePayment $payment,
+        Zipcode $zipcode,
+        array $customer,
+        array $metadata,
+    ): array {
+        $holdService = app(CheckoutHoldService::class);
+
+        $exceptHoldId = $holdService->findActiveHoldForCustomerAndZip($customer['email'], $zipcode->id)?->id
+            ?? CheckoutHold::query()
+                ->where('stripe_payment_id', $payment->id)
+                ->where('status', CheckoutHold::STATUS_ACTIVE)
+                ->value('id');
+
+        $exceptWaitlistId = null;
+        $waitlistIdRaw = $metadata['waitlist_id'] ?? $payment->metadata['waitlist_id'] ?? null;
+
+        if (filled($waitlistIdRaw)) {
+            $exceptWaitlistId = (int) $waitlistIdRaw;
+        } elseif ($exceptHoldId) {
+            $exceptWaitlistId = CheckoutHold::query()
+                ->whereKey($exceptHoldId)
+                ->value('waitlist_id');
+        }
+
+        return [$exceptHoldId, $exceptWaitlistId];
     }
 
     /**

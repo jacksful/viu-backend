@@ -2,9 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Auth\AdminEmailAuthentication;
 use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\ChangePassword;
 use App\Filament\Pages\EditProfile;
+use App\Notifications\AdminLoginOtpNotification;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -34,6 +36,11 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
+            ->multiFactorAuthentication([
+                AdminEmailAuthentication::make()
+                    ->codeExpiryMinutes(10)
+                    ->codeNotification(AdminLoginOtpNotification::class),
+            ])
             ->profile(EditProfile::class, isSimple: false)
             ->colors([
                 'primary' => Color::Blue,

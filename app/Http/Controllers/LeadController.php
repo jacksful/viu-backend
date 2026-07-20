@@ -136,7 +136,7 @@ class LeadController extends Controller
                 'is_in_coverage_area' => true,
                 'is_purchasable' => true,
                 'is_valid' => true,
-                'title' => 'ZIP unavailable',
+                'title' => 'ZIP Unavailable',
                 'message' => "ZIP code " . $zipcodeCode . " is currently owned by another agent. Try a different ZIP code Or fill out the form below to be notified when it becomes available.",
             ], 200);
         }
@@ -147,8 +147,8 @@ class LeadController extends Controller
                 'is_in_coverage_area' => true,
                 'is_purchasable' => false,
                 'is_valid' => true,
-                'title' => 'Not ready for purchase',
-                'message' => 'Property data is not available yet for this ZIP code. Fill out the form below and we will notify you when it is ready to purchase.',
+                'title' => 'Zip Unavailable. We will notify you when it becomes available.',
+                'message' => 'Fill out the form below and we will notify you when it is ready to purchase.',
             ], 200);
         }
 
@@ -158,8 +158,8 @@ class LeadController extends Controller
                 'is_in_coverage_area' => true,
                 'is_purchasable' => false,
                 'is_valid' => true,
-                'title' => 'Not ready for purchase',
-                'message' => 'Subscription pricing is not configured yet for this ZIP code. Fill out the form below and we will follow up.',
+                'title' => 'Zip Unavailable. We will notify you when it becomes available.',
+                'message' => 'Fill out the form below and we will follow up.',
             ], 200);
         }
 

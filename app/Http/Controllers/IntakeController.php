@@ -52,8 +52,8 @@ class IntakeController extends Controller
             'logo' => ['required', 'file', 'extensions:svg,ai,eps,png', 'max:15360'],
             'brokerage_logo' => ['nullable', 'file', 'extensions:svg,ai,eps,png', 'max:15360'],
             'lifestyle' => ['nullable', 'file', 'extensions:jpg,jpeg,png', 'max:15360'],
-            'color1' => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
-            'color2' => ['required', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'color1' => ['nullable', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
+            'color2' => ['nullable', 'regex:/^#?[0-9A-Fa-f]{6}$/'],
             'full_name' => ['required', 'string', 'max:255'],
             'tagline' => ['required', 'string', 'max:255', function (string $attribute, mixed $value, \Closure $fail): void {
                 $words = str_word_count(trim((string) $value));
@@ -107,8 +107,12 @@ class IntakeController extends Controller
                     'user_id' => $subscription->user_id,
                     'zipcode_id' => $zipcode->id,
                     ...$paths,
-                    'brand_color_1' => $this->normalizeHex($validated['color1']),
-                    'brand_color_2' => $this->normalizeHex($validated['color2']),
+                    'brand_color_1' => filled($validated['color1'] ?? null)
+                        ? $this->normalizeHex($validated['color1'])
+                        : null,
+                    'brand_color_2' => filled($validated['color2'] ?? null)
+                        ? $this->normalizeHex($validated['color2'])
+                        : null,
                     'full_name' => $validated['full_name'],
                     'tagline' => $validated['tagline'],
                     'bio' => $validated['bio'],

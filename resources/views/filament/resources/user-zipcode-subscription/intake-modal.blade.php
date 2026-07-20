@@ -91,23 +91,31 @@
         <div class="mb-4 flex flex-wrap items-center gap-3">
             <div class="space-y-1">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Primary color</p>
-                <div class="flex items-center gap-2">
-                    <span
-                        class="inline-block h-6 w-6 rounded border border-gray-200 dark:border-gray-600"
-                        style="background-color: {{ $intake->brand_color_1 }}"
-                    ></span>
-                    <span class="font-mono text-sm text-gray-950 dark:text-white">{{ $intake->brand_color_1 }}</span>
-                </div>
+                @if($intake->brand_color_1)
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="inline-block h-6 w-6 rounded border border-gray-200 dark:border-gray-600"
+                            style="background-color: {{ $intake->brand_color_1 }}"
+                        ></span>
+                        <span class="font-mono text-sm text-gray-950 dark:text-white">{{ $intake->brand_color_1 }}</span>
+                    </div>
+                @else
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Not provided</span>
+                @endif
             </div>
             <div class="space-y-1">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Secondary color</p>
-                <div class="flex items-center gap-2">
-                    <span
-                        class="inline-block h-6 w-6 rounded border border-gray-200 dark:border-gray-600"
-                        style="background-color: {{ $intake->brand_color_2 }}"
-                    ></span>
-                    <span class="font-mono text-sm text-gray-950 dark:text-white">{{ $intake->brand_color_2 }}</span>
-                </div>
+                @if($intake->brand_color_2)
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="inline-block h-6 w-6 rounded border border-gray-200 dark:border-gray-600"
+                            style="background-color: {{ $intake->brand_color_2 }}"
+                        ></span>
+                        <span class="font-mono text-sm text-gray-950 dark:text-white">{{ $intake->brand_color_2 }}</span>
+                    </div>
+                @else
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Not provided</span>
+                @endif
             </div>
         </div>
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">

@@ -49,6 +49,7 @@ class StripeWebhookController extends Controller
         match ($event->type) {
             'checkout.session.completed' => $this->handleCheckoutSessionCompleted($event->data->object),
             'checkout.session.expired' => $this->subscriptions->handleCheckoutSessionExpired($event->data->object),
+            'checkout.session.async_payment_succeeded' => $this->handleCheckoutSessionCompleted($event->data->object),
             'checkout.session.async_payment_failed' => $this->subscriptions->handleCheckoutSessionFailed($event->data->object),
             'customer.subscription.updated' => $this->subscriptions->syncSubscriptionStatus($event->data->object),
             'customer.subscription.deleted' => $this->subscriptions->syncSubscriptionStatus($event->data->object),

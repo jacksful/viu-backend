@@ -7,7 +7,9 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
 
 class CustomerEmailVerificationController extends Controller
 {
@@ -27,10 +29,7 @@ class CustomerEmailVerificationController extends Controller
         }
 
         if ($user->hasVerifiedEmail()) {
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            return redirect()->route('user.dashboard')->with('status', 'Email already verified.');
+            return $this->redirectAfterVerification($user);
         }
 
         if ($user->markEmailAsVerified()) {
@@ -38,9 +37,26 @@ class CustomerEmailVerificationController extends Controller
             $user->update(['status' => 'active']);
         }
 
-        Auth::login($user);
-        $request->session()->regenerate();
+        return $this->redirectAfterVerification($user->fresh());
+    }
 
-        return redirect()->route('user.dashboard')->with('status', 'Email verified successfully!');
+    protected function redirectAfterVerification(User $user): RedirectResponse
+    {
+        if ($user->password_set_at) {
+            return redirect()->route('user.login')
+                ->with('status', 'Email verified successfully! Please sign in.');
+        }
+
+        $setupUrl = URL::temporarySignedRoute(
+            'password.setup',
+            Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            [
+                'id' => $user->getKey(),
+                'hash' => sha1($user->getEmailForVerification()),
+            ]
+        );
+
+        return redirect()->to($setupUrl)
+            ->with('status', 'Email verified! Please set your password to continue.');
     }
 }
