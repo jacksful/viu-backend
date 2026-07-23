@@ -2,6 +2,9 @@
 
 namespace App\Livewire\Auth;
 
+use App\Forms\Components\Turnstile;
+use App\Livewire\Concerns\ValidatesCloudflareTurnstile;
+use App\Models\CloudflareSetting;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Actions\Action;
@@ -24,6 +27,7 @@ use Illuminate\Validation\ValidationException;
 class CustomerLoginPage extends SimplePage
 {
     use RestrictsFileUploadsToSchemaComponents;
+    use ValidatesCloudflareTurnstile;
     use WithRateLimiting;
 
     /**
@@ -66,12 +70,16 @@ class CustomerLoginPage extends SimplePage
             return null;
         }
 
+        $this->validateCloudflareTurnstile(CloudflareSetting::singleton()->isRequiredForCustomerLogin());
+
         $data = $this->form->getState();
 
         if (! Auth::attempt(
             ['email' => $data['email'], 'password' => $data['password']],
             $data['remember'] ?? false,
         )) {
+            $this->resetCloudflareTurnstile();
+
             throw ValidationException::withMessages([
                 'data.email' => 'The provided credentials do not match our records.',
             ]);
@@ -83,6 +91,8 @@ class CustomerLoginPage extends SimplePage
 
         if ($user->role !== 'customer') {
             Auth::logout();
+
+            $this->resetCloudflareTurnstile();
 
             throw ValidationException::withMessages([
                 'data.email' => 'You do not have access to the customer portal.',
@@ -120,9 +130,13 @@ class CustomerLoginPage extends SimplePage
                 ->password()
                 ->revealable()
                 ->autocomplete('current-password')
-                ->required(),
+                ->required()
+                ->hint(new HtmlString(
+                    '<a href="'.route('user.password.request').'" class="fi-link fi-link-size-sm fi-color-custom fi-color-primary fi-text-color-600 dark:fi-text-color-400">Forgot password?</a>'
+                )),
             Checkbox::make('remember')
                 ->label('Remember me'),
+            ...$this->getTurnstileFormComponents(),
         ]);
     }
 
@@ -164,5 +178,21 @@ class CustomerLoginPage extends SimplePage
     protected function hasFullWidthFormActions(): bool
     {
         return true;
+    }
+
+    /**
+     * @return array<int, Turnstile>
+     */
+    protected function getTurnstileFormComponents(): array
+    {
+        if (! CloudflareSetting::singleton()->isRequiredForCustomerLogin()) {
+            return [];
+        }
+
+        return [
+            Turnstile::make('turnstile_token')
+                ->siteKey(fn (): ?string => CloudflareSetting::singleton()->site_key)
+                ->label('Security check'),
+        ];
     }
 }

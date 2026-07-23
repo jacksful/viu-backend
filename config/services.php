@@ -46,4 +46,14 @@ return [
         'cancel_url' => env('STRIPE_CANCEL_URL'),
     ],
 
+    'cloudflare' => [
+        'turnstile' => [
+            'enabled' => env('CLOUDFLARE_TURNSTILE_ENABLED', false),
+            'site_key' => env('CLOUDFLARE_TURNSTILE_SITE_KEY'),
+            'secret_key' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
+            'admin_login_enabled' => env('CLOUDFLARE_TURNSTILE_ADMIN_LOGIN', true),
+            'customer_login_enabled' => env('CLOUDFLARE_TURNSTILE_CUSTOMER_LOGIN', true),
+        ],
+    ],
+
 ];

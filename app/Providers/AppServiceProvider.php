@@ -14,6 +14,7 @@ use App\Models\CmsRecognitionSection;
 use App\Models\CmsStrategicWindowSection;
 use App\Models\CmsTerritoryZipSection;
 use App\Models\Contact;
+use App\Models\CloudflareSetting;
 use App\Models\EmailSetting;
 use App\Models\StripeSetting;
 use App\Models\Waitlist;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             EmailSetting::applyMailConfig();
             StripeSetting::applyConfig();
+            CloudflareSetting::applyConfig();
         } catch (\Throwable) {
             // Database may be unavailable during initial install.
         }
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 EmailSetting::applyMailConfig();
                 StripeSetting::applyConfig();
+                CloudflareSetting::applyConfig();
             } catch (\Throwable) {
                 //
             }

@@ -4,6 +4,10 @@
 @source '../../../../resources/views/filament/**/*';
 
 @layer components {
+    .fi-badge {
+        @apply w-max shrink-0;
+    }
+
     .fi-sidebar {
         @apply lg:bg-white lg:ring-1 lg:ring-gray-950/5 dark:lg:bg-gray-900 dark:lg:ring-white/10;
     }

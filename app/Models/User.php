@@ -10,7 +10,9 @@ use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
+use App\Notifications\CustomerResetPassword;
 use App\Notifications\CustomerVerifyEmail;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailAuthentication, MustVerifyEmail
@@ -82,6 +84,20 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailA
         } else {
             $this->notify(new VerifyEmail);
         }
+    }
+
+    /**
+     * Send the password reset notification.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        if ($this->role === 'customer') {
+            $this->notify(new CustomerResetPassword($token));
+
+            return;
+        }
+
+        $this->notify(new ResetPassword($token));
     }
 
     public function canAccessPanel(Panel $panel): bool

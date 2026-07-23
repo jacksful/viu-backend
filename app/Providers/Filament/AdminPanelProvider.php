@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Auth\AdminEmailAuthentication;
+use App\Filament\Auth\AdminLogin;
 use App\Filament\Pages\AdminDashboard;
 use App\Filament\Pages\ChangePassword;
 use App\Filament\Pages\EditProfile;
@@ -35,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->maxContentWidth(Width::Full)
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->login()
+            ->login(AdminLogin::class)
             ->multiFactorAuthentication([
                 AdminEmailAuthentication::make()
                     ->codeExpiryMinutes(10)

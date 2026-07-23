@@ -13,21 +13,33 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo(fn () => route('user.login'));
+        $middleware->redirectGuestsTo(function () {
+            $request = request();
+
+            if ($request->is('admin', 'admin/*')) {
+                return route('filament.admin.auth.login');
+            }
+
+            return route('user.login');
+        });
 
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Set default login route to user.login
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, $request) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Unauthenticated.'], 401);
             }
-            
-            // Default redirect to user portal login
-            return redirect()->guest(route('user.login'));
+
+            $redirectTo = $e->redirectTo($request);
+
+            if ($redirectTo === null && $request->is('admin', 'admin/*')) {
+                $redirectTo = route('filament.admin.auth.login');
+            }
+
+            return redirect()->guest($redirectTo ?? route('user.login'));
         });
     })
     ->withSchedule(function (Schedule $schedule): void {

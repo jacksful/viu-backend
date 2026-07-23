@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Auth\CustomerAuthController;
 use App\Http\Controllers\Auth\CustomerEmailVerificationController;
+use App\Livewire\Auth\CustomerForgotPasswordPage;
 use App\Livewire\Auth\CustomerLoginPage;
 use App\Livewire\Auth\CustomerRegisterPage;
+use App\Livewire\Auth\CustomerResetPasswordPage;
 use App\Livewire\Auth\CustomerSetPasswordPage;
 use App\Http\Controllers\Auth\CustomerVerificationNoticeController;
 use App\Http\Controllers\Auth\CustomerVerificationResendController;
@@ -113,6 +115,8 @@ Route::prefix('user')->group(function () {
         Route::middleware('guest')->group(function () {
             Route::get('/login', CustomerLoginPage::class)->name('login');
             Route::get('/register', CustomerRegisterPage::class)->name('register');
+            Route::get('/forgot-password', CustomerForgotPasswordPage::class)->name('password.request');
+            Route::get('/reset-password/{token}', CustomerResetPasswordPage::class)->name('password.reset');
         });
 
         // Authenticated portal routes (require verified email, customer role)
